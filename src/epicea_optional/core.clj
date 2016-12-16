@@ -6,7 +6,6 @@
   (throw (RuntimeException. (apply str s))))
 
 (defn compile-either-sub [m x cb]
-  (println "Calling it with " x)
   (cond
     (empty? x) (error "Either cannot be empty")
     (= 1 (count x)) (compile-sub m (first x) cb)
