@@ -72,7 +72,10 @@
       (error "optionally expects two arguments but got " x))))
 
 (defn compile-other-form [m x cb]
-  (cb m x))
+  (let [f (first x)]
+    (cond
+      (contains? special-forms f) (cb m x)
+      :default (cb m x))))
 
 (defn compile-seq [m x cb]
   (println "Parse this: " x)
