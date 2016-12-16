@@ -9,19 +9,19 @@
 (defn optionally-sym? [f]
   (or (= 'optionally f) (= `optionally f)))
 
-(def special-forms #{'if :if
-                     'do :do
-                     'loop :loop
-                     'var :var
-                     'let :let
-                     'fn :fn
-                     'throw :throw
-                     'try :try
-                     'catch :catch
-                     'monitor-enter :monitor-enter
-                     'monitor-exit :monitor-exit
-                     'recur :recur
-                     'def :def})
+(def special-forms {'if :if
+                    'do :do
+                    'loop :loop
+                    'var :var
+                    'let :let
+                    'fn :fn
+                    'throw :throw
+                    'try :try
+                    'catch :catch
+                    'monitor-enter :monitor-enter
+                    'monitor-exit :monitor-exit
+                    'recur :recur
+                    'def :def})
 
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
@@ -62,9 +62,16 @@
       (compile-optionally-sub m args cb)
       (error "optionally expects two arguments but got " x))))
 
+(defn compile-if [m x cb]
+  (error "TODO")
+  (cb m x))
+
 (defn compile-other-form [m x cb]
-  (let [f (first x)]
+  (let [f (first x)
+        k (get special-forms f)]
+    (println "Got " x " which is " k)
     (cond
+      (= k :if) (compile-if m x cb)
       (contains? special-forms f) (cb m x)
       :default (cb m x))))
 
