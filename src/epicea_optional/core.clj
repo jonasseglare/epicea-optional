@@ -14,10 +14,18 @@
 (defn compile-either [m x cb]
   (compile-either-sub m (rest x) cb))
 
+(defn compile-optionally [m x cb]
+  (cb m x))
+
+(defn compile-other-form [m x cb]
+  (cb m x))
+
 (defn compile-seq [m x cb]
-  (cond
-    (= `either (first x)) (compile-either m x cb)
-    :default (cb m x)))
+  (let [f (first x)]
+    (cond
+      (= `either f) (compile-either m x cb)
+      (= `optionally f) (compile-optionally m x cb)
+      :default (compile-other-form m (macroexpand x) cb))))
 
 (defn compile-sub [m x cb]
   (cond
