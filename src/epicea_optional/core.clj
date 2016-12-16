@@ -9,9 +9,19 @@
 (defn optionally-sym? [f]
   (or (= 'optionally f) (= `optionally f)))
 
-(def special-forms #{'if 'do 'loop 'var 'let 
-                     'fn 'throw 'try 'catch 'monitor-enter
-                     'monitor-exit 'recur 'def})
+(def special-forms #{'if :if
+                     'do :do
+                     'loop :loop
+                     'var :var
+                     'let :let
+                     'fn :fn
+                     'throw :throw
+                     'try :try
+                     'catch :catch
+                     'monitor-enter :monitor-enter
+                     'monitor-exit :monitor-exit
+                     'recur :recur
+                     'def :def})
 
 (defn if-sym? [f]
   (= 'if f))
@@ -78,9 +88,7 @@
       :default (cb m x))))
 
 (defn compile-seq [m x cb]
-  (println "Parse this: " x)
   (let [f (first x)]
-    (println "How does it compare? " (= `optionally f))
     (cond
       (either-sym? f) (compile-either m x cb)
       (optionally-sym? f) (compile-optionally m x cb)
@@ -93,7 +101,6 @@
 
 
 (defn compile-top [x]
-  (println "Call compile top on " x)
   (compile-sub 
    {} x 
    (fn [m x]
