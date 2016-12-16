@@ -1,6 +1,5 @@
 (ns epicea-optional.core)
 
-
 (declare compile-sub)
 
 (defn error [& s]
@@ -60,7 +59,7 @@
     :default x))
 
 
-(defn comptile-top [x]
+(defn compile-top [x]
   (println "Call compile top on " x)
   (compile-sub 
    {} x 
@@ -72,4 +71,4 @@
 
 
 (defmacro either [& x]
-  (comptile-top `(either ~@x)))
+  (compile-top `(either ~@x)))
