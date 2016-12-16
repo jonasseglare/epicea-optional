@@ -2,6 +2,28 @@
 
 (declare compile-sub)
 
+
+(defn either-sym? [f]
+  (or (= 'either f) (= `either f)))
+
+(defn optionally-sym? [f]
+  (or (= 'optionally f) (= `optionally f)))
+
+(defn if-sym? [f]
+  (or (= `if f) (= 'if f)))
+
+(defn do-sym? [f]
+  (or (= `do f) (= 'do f)))
+
+(defn var-sym? [f]
+  (or (= `var f) (= 'var f)))
+
+(defn let-sym? [f]
+  (= 'let f))
+
+
+
+
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
 
@@ -44,12 +66,6 @@
 (defn compile-other-form [m x cb]
   (cb m x))
 
-(defn either-sym? [f]
-  (or (= 'either f) (= `either f)))
-
-(defn optionally-sym? [f]
-  (or (= 'optionally f) (= `optionally f)))
-
 (defn compile-seq [m x cb]
   (println "Parse this: " x)
   (let [f (first x)]
@@ -78,3 +94,8 @@
 
 (defmacro either [& x]
   (compile-top `(either ~@x)))
+
+(defmacro is-let? [x]
+  (if (= (first x) 'let)
+    x nil))
+
