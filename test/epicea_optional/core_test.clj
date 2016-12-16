@@ -1,6 +1,8 @@
 (ns epicea-optional.core-test
   (:require [clojure.test :refer :all]
-            [epicea-optional.core :refer [either optionally is-let? compile-top]]))
+            [epicea-optional.core :refer 
+             [either optionally test-special
+              compile-top]]))
 
 (deftest basic
   (testing "Basic testing"
@@ -24,5 +26,5 @@
             true)))))
 
 (deftest special-syms
-  (is (= 5 (is-let? (let [a 3] (+ a 2))))))
+  (is (= 5 (test-special (let [a 3] (+ a 2))))))
 

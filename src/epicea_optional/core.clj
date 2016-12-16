@@ -9,19 +9,27 @@
 (defn optionally-sym? [f]
   (or (= 'optionally f) (= `optionally f)))
 
+(def special-forms #{'if 'do 'loop 'var 'let 
+                     'fn 'throw 'try 'catch 'monitor-enter
+                     'monitor-exit 'recur 'def})
+
 (defn if-sym? [f]
-  (or (= `if f) (= 'if f)))
+  (= 'if f))
 
 (defn do-sym? [f]
-  (or (= `do f) (= 'do f)))
+  (= 'do f))
 
 (defn var-sym? [f]
-  (or (= `var f) (= 'var f)))
+  (= 'var f))
 
 (defn let-sym? [f]
   (= 'let f))
 
+(defn loop-sym? [f]
+  (= 'loop f))
 
+(defn fn-sym? [f]
+  (= 'fn f))
 
 
 (defn error [& s]
@@ -95,7 +103,7 @@
 (defmacro either [& x]
   (compile-top `(either ~@x)))
 
-(defmacro is-let? [x]
-  (if (= (first x) 'let)
+(defmacro test-special [x]
+  (if (contains? special-forms (first x))
     x nil))
 
