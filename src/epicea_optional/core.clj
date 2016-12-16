@@ -14,8 +14,18 @@
 (defn compile-either [m x cb]
   (compile-either-sub m (rest x) cb))
 
+(defn compile-optionally-sub [m [test-expr value-expr] cb]
+  (let [t (gensym)
+        v (gensym)]
+    `(let [~t ~test-expr
+           ~v (if ~t ~value-expr)]
+       ~(cb (assoc m v t) v))))
+
 (defn compile-optionally [m x cb]
-  (cb m x))
+  (let [args (rest x)]
+    (if (= 2 (count args))
+      (compile-optionally-sub m args cb)
+      (error "optionally expects two arguments but got " x))))
 
 (defn compile-other-form [m x cb]
   (cb m x))
