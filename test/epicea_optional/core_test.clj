@@ -6,4 +6,6 @@
   (testing "FIXME, I fail."
     (is (= 9 (either 9)))
     (is (= 4 (either (optionally false 3) 4)))
-    (is (= 3 (either (optionally true 3) 4)))))
+    (is (= 3 (either (optionally true 3) 4)))
+    (is (= 5 (either 5 (optionally true 3))))))
+
