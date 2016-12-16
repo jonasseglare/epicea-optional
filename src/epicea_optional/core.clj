@@ -23,25 +23,6 @@
                      'recur :recur
                      'def :def})
 
-(defn if-sym? [f]
-  (= 'if f))
-
-(defn do-sym? [f]
-  (= 'do f))
-
-(defn var-sym? [f]
-  (= 'var f))
-
-(defn let-sym? [f]
-  (= 'let f))
-
-(defn loop-sym? [f]
-  (= 'loop f))
-
-(defn fn-sym? [f]
-  (= 'fn f))
-
-
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
 
