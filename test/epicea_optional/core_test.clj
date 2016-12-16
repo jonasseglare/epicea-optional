@@ -4,4 +4,6 @@
 
 (deftest a-test
   (testing "FIXME, I fail."
-    (is (= 9 (either 9)))))
+    (is (= 9 (either 9)))
+    (is (= 4 (either (optionally false 3)
+                     4)))))

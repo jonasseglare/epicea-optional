@@ -1,9 +1,13 @@
 (ns epicea-optional.core)
 
+
 (declare compile-sub)
 
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
+
+(defmacro optionally [x]
+  (error "optionally called outside of select: " x))
 
 (defn compile-either-sub [m x cb]
   (cond
