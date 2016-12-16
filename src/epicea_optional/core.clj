@@ -1,10 +1,16 @@
 (ns epicea-optional.core)
 
+(declare compile-sub)
+
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
 
 (defn compile-either-sub [m x cb]
-  (cb m :either))
+  (println "Calling it with " x)
+  (cond
+    (empty? x) (error "Either cannot be empty")
+    (= 1 (count x)) (compile-sub m (first x) cb)
+    :default (compile-either-sub m (rest x) cb)))
 
 (defn compile-either [m x cb]
   (compile-either-sub m (rest x) cb))
@@ -17,7 +23,7 @@
 (defn compile-sub [m x cb]
   (cond
     (seq? x) (compile-seq m x cb)
-    :default nil))
+    :default x))
 
 
 (defn comptile-top [x]
