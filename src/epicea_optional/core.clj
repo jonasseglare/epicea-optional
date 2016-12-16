@@ -44,13 +44,19 @@
 (defn compile-other-form [m x cb]
   (cb m x))
 
+(defn either-sym? [f]
+  (or (= 'either f) (= `either f)))
+
+(defn optionally-sym? [f]
+  (or (= 'optionally f) (= `optionally f)))
+
 (defn compile-seq [m x cb]
   (println "Parse this: " x)
   (let [f (first x)]
     (println "How does it compare? " (= `optionally f))
     (cond
-      (or (= 'either f) (= `either f)) (compile-either m x cb)
-      (or (= 'optionally f) (= `optionally f)) (compile-optionally m x cb)
+      (either-sym? f) (compile-either m x cb)
+      (optionally-sym? f) (compile-optionally m x cb)
       :default (compile-other-form m (macroexpand x) cb))))
 
 (defn compile-sub [m x cb]
