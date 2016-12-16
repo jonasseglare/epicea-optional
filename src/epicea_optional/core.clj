@@ -3,8 +3,11 @@
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
 
+(defn compile-either-sub [m x cb]
+  (cb m :either))
+
 (defn compile-either [m x cb]
-  (cb m x))
+  (compile-either-sub m (rest x) cb))
 
 (defn compile-seq [m x cb]
   (cond
