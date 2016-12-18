@@ -118,6 +118,12 @@
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
 
+(defn return-defined [err]
+  (fn [m x]
+    (if (contains? m x)
+      (error err)
+      x)))
+
 (defmacro optionally [& args]
   (error "optionally called outside of select on args: " args))
 
@@ -334,9 +340,53 @@
       (error (spec/explain ::fn-form x))
       (compile-fn-sub m x cb))))
 
-(defn compile-try [m x cb]
-  (println "Correct treatment of try/catch is currently not implemented")
-  (cb m x))
+
+
+(defn compile-catch-form [m x]
+  (update-in 
+   x [:forms]
+   (fn [forms]
+     [(compile-sub
+       (dissoc m (:var-name x))
+       `(do ~@forms)
+       (return-defined "Forms in catch must not be optional"))])))
+
+(defn compile-catch-forms [m forms]
+  (map #(compile-sub m %) forms))
+
+(defn compile-finally-form [m x cb]
+  (update-in 
+   x [:forms]
+   (fn [forms]
+     (compile-sub 
+      m `(do ~forms)
+      (return-defined "The finally form cannot be optional")))))
+
+(defn compile-try-sub [m x cb]
+  (println "COMPILE TRY: " x)
+  (cb m (spec/unform
+         ::try-form
+         (merge
+          x
+
+          {:forms
+           [(compile-sub
+             m `(do ~@(:forms x)) 
+             (return-defined "Forms inside try must not be optional"))]}
+
+          {:catch-forms
+           (compile-catch-forms m (:catch-forms x))}
+          
+          (if (contains? x :finally-form)
+            (compile-finally-form m (:finally-form x))
+            {})))))
+
+
+(defn compile-try [m x0 cb]
+  (let [x (spec/conform ::try-form x0)]
+    (if (= ::spec/invalid x)
+      (error (spec/explain ::try-form x0))
+      (compile-try-sub m x cb))))
 
 (defn compile-quote [m x cb]
   (cb m x))

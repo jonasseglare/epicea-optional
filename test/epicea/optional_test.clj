@@ -103,3 +103,6 @@
 
 (deftest quote-test
   (is (= '(a) (either (let [a (expect number? :a)] '(a))))))
+
+(deftest try-catch-finally
+  (is (= 9 (either (try 9)))))
