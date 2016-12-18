@@ -166,6 +166,12 @@
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
 
+(defn compile-function-or-macro-call [m x cb]
+  (let [expanded (macroexpand x)]
+    (if (= expanded x)
+      (compile-fun-call m x cb)
+      (compile-sub m expanded cb))))
+
 (defn compile-other-form [m x cb]
   (println "GOT " x)
   (let [f (first x)
@@ -176,7 +182,7 @@
       (= k :do) (compile-do m x cb)
       (= k :let) (compile-let m x cb)
       (contains? special-forms f) (cb m x)
-      :default (compile-fun-call m x cb))))
+      :default (compile-function-or-macro-call m x cb))))
 
 (defn compile-seq [m x cb]
   (println "Compile seq")
