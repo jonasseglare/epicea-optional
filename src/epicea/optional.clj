@@ -294,7 +294,8 @@
   (update-in
    x [:forms]
    (fn [forms]
-     [(compile-sub m `(do ~@forms) return-from-fn)])))
+     [(compile-sub (dissoc-many m (:args x))
+                   `(do ~@forms) return-from-fn)])))
 
 (defn compile-fn-sub [m x cb]
   (cb m (spec/unform
