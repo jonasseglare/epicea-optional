@@ -1,6 +1,6 @@
-(ns epicea-optional.core-test
+(ns epicea.optional-test
   (:require [clojure.test :refer :all]
-            [epicea-optional.core :refer 
+            [epicea.optional :refer 
              [either optionally test-special
               compile-top]]))
 

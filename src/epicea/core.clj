@@ -1,7 +1,6 @@
-(ns epicea-optional.core)
+(ns epicea.optional)
 
 (declare compile-sub)
-
 
 (defn either-sym? [f]
   (or (= 'either f) (= `either f)))
