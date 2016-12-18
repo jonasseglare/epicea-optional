@@ -15,4 +15,7 @@
   (is (= 4 (either (unwrap [:value 4])
                    9)))
   (is (= 9 (either (unwrap [:garbage 4])
+                   9)))
+
+  (is (= 4 (either (unwrap :garbage [:garbage 4])
                    9))))

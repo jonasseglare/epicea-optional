@@ -26,5 +26,6 @@
 (defmacro wrap [expr]
   `(epicea.optional/either (tag-value ~expr) undefined))
 
-(defmacro unwrap [expr]
-  `(value (epicea.optional/expect value? ~expr)))
+(defmacro unwrap 
+  ([expr] `(value (epicea.optional/expect value? ~expr)))
+  ([tag expr] `(value (epicea.optional/expect (tagged? ~tag) ~expr))))
