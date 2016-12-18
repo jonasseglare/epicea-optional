@@ -158,12 +158,12 @@
 
 (defn compile-fun-call [m x cb]
   (compile-arg-list 
-   [] m (rest x)
+   [] m x
    (fn [m arg-list]
      (wrap-sub-expr 
       m arg-list
       (fn [m]
-        (cb m `(~(first x) ~@arg-list)))
+        (cb m `(~@arg-list)))
       cb))))
 
 (defn compile-bindings [m bindings cb]
