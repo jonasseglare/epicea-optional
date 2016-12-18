@@ -195,7 +195,6 @@
   (compile-do-sub m (rest x) cb))
 
 (defn compile-function-or-macro-call [m x cb]
-  (println "Compile function or macro call on " x)
   (let [expanded (macroexpand x)]
     (if (= expanded x)
       (compile-fun-call m x cb)
@@ -211,7 +210,6 @@
 
 
 (defn return-from-loop [m expr] 
-  (println "Received this: " expr "and map" m)
   (if (contains? m expr)
     `(if ~(get m expr) (vector ~expr))
     `(vector ~expr)))
@@ -238,7 +236,6 @@
           
 
 (defn compile-loop [m x0 cb]
-  (println "COMPILE LOOP:" x0)
   (let [x (spec/conform ::loop-form x0)]
     (if (= x ::spec/invalid)
       (error (spec/explain ::loop-form x0))
@@ -264,7 +261,6 @@
       :default (compile-other-form m x cb))))
 
 (defn compile-sub [m x cb]
-  (println "COMPILE SUB: " x)
   (cond
     (seq? x) (compile-seq m x cb)
     :default (cb m x)))
