@@ -85,19 +85,19 @@
                         a)
                     nil))))
 
-;; (deftest fn-test
-;;   (is (= 7 ((either (fn rulle [a] (+ a 3))) 4)))
-;;   (is (= 7 ((either (fn [a] (+ a 3))) 4)))
-;;   (is (= 13 (either (let [a (expect number? :not-number)]
-;;                       (either ((fn [a] (+ 4 a)) 9)
-;;                               :not-good)))))
-;;   (is (= 13 (either (let [a (expect number? :not-number)]
-;;                       (either a
-;;                               ((fn [a] (+ 4 a)) 9)
-;;                               :not-good)))))
-;;   (is (= 9 (either (let [a (expect number? :not-number)]
-;;                      (either a
-;;                              ((fn [b] (either (+ 4 a) b)) 9)
-;;                              :not-good))))))
+(deftest fn-test
+  (is (= 7 ((either (fn rulle [a] (+ a 3))) 4)))
+  (is (= 7 ((either (fn [a] (+ a 3))) 4)))
+  (is (= 13 (either (let [a (expect number? :not-number)]
+                      (either ((fn [a] (+ 4 a)) 9)
+                              :not-good)))))
+  (is (= 13 (either (let [a (expect number? :not-number)]
+                      (either a
+                              ((fn [a] (+ 4 a)) 9)
+                              :not-good)))))
+  (is (= 9 (either (let [a (expect number? :not-number)]
+                     (either a
+                             ((fn [b] (either (+ 4 a) b)) 9)
+                             :not-good))))))
 
 
