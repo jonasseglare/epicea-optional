@@ -39,8 +39,11 @@
            ~val-sym (if ~test-sym ~(cb-subexpr (dissoc-many m symbols)))]
        ~(cb (assoc m val-sym test-sym) val-sym))))
 
+(defn get-optional-test-symbols [m dependencies]
+  (filter identity (map #(get m %) dependencies)))
+
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
-  (let [symbols (filter identity (map #(get m %) dependencies))]
+  (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
       (cb m (cb-subexpr m))
       (wrap-dependent-sub-expr
@@ -197,9 +200,36 @@
       (compile-fun-call m x cb)
       (compile-sub m expanded cb))))
 
+(defn compile-loop-sub [m x cb]
+  (let [raw-sym (gensym)
+        test-sym (gensym)
+        loop-sym (gensym)
+        bindings (:bindings x)
+        test-symbols (get-optional-test-symbols m (map :symbol bindings))]
+    (compile-bindings
+     m (:bindings x)
+     (fn [m]
+       `(let [~raw-sym
+              `(if `(and ~@test-symbols)
+                 (loop ~(make-loop-bindings bindings)
+                   ~(compile-sub 
+                     (dissoc-many m test-symbols) (:forms x) 
+                     (fn [m expr] 
+                       (if (contains? m expr)
+                         `(if ~(get m expr) [expr])
+                         `[expr]))))
+                 ~test-sym (vector? raw-sym)
+                 ~loop-sym (first ~raw-sym))]
+          ~(cb (assoc m loop-sym test-sym) loop-sym))))))
+          
+          
+
 (defn compile-loop [m x0 cb]
-  (println "Compile LOOP on " x0 "with" m)
-  (cb m x0))
+  (let [x (spec/conform ::loop-form x0)]
+    (if (= x ::spec/invalid)
+      (error (spec/explain ::loop-form x0))
+      (compile-loop-sub 
+       m x cb))))
 
 (defn compile-other-form [m x cb]
   (let [f (first x)
