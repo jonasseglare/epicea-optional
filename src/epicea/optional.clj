@@ -474,5 +474,3 @@
 (defmacro expect [test-fun expr]
   `(let [esym# ~expr]
      (optionally (~test-fun esym#) esym#)))
-       
-  
