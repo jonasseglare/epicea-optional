@@ -49,6 +49,7 @@
                     'do :do
                     'loop :loop
                     'var :var
+                    `let :let
                     'let :let
                     'fn :fn
                     'throw :throw
