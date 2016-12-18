@@ -45,8 +45,7 @@
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
   (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
-      (cb m (cb-subexpr m)) ;; Probably not right...
-      ;(cb-subexpr m)
+      (cb-subexpr m)
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
 
@@ -235,7 +234,7 @@
             ~(cb (assoc m loop-sym test-sym) loop-sym)))))))
 
 (defn return-from-loop [m expr]
-  (println "REETURN FROM LOOP")
+  (println "RETURN FROM LOOP" expr m)
   (if (contains? m expr)
     (error "Loop result values may not be optional")
     expr))
