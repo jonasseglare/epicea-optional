@@ -9,10 +9,22 @@
      (let [[a b] x]
        (= a tag)))))
 
-(defn tagged-value [x]
+(defn value [x]
   (second x))
 
 (defn tag 
   ([t x] [t x])
   ([t] (fn [x] (tag t x))))
-  
+
+
+
+;;; Convenience definitions  
+(def tag-value (tag :value))
+(def undefined (tag :undefined nil))
+(def value? (tagged? :value))
+
+(defmacro wrap [expr]
+  `(epicea.optional/either (tag-value ~expr) undefined))
+
+(defmacro unwrap [expr]
+  `(value (epicea.optional/expect value? ~expr)))
