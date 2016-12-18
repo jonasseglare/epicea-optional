@@ -467,10 +467,25 @@
 (defmacro either [& x]
   (compile-top `(either ~@x)))
 
+;; Just for debugging
 (defmacro test-special [x]
   (if (contains? special-forms (first x))
     x nil))
 
+
+
+;;;; Utilities 
 (defmacro expect [test-fun expr]
   `(let [esym# ~expr]
      (optionally (~test-fun esym#) esym#)))
+
+(defmacro defined? [expr]
+  `(either (do ~expr true)
+           false))
+
+(defmacro undefined? [expr]
+  `(either (do ~expr false)
+           true))
+
+(defmacro but [expr]
+  `(expect true? (undefined? ~expr)))

@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [epicea.optional :refer 
              [either optionally test-special
-              compile-top expect]] :reload-all))
+              compile-top expect defined? undefined? but]] :reload-all))
 
 (deftest basic
   (testing "Basic testing"
@@ -126,3 +126,10 @@
   (is (= {:a 3 :b 4} (either {:a 3 :b 4} 9)))
   (is (= 9 (either {:a (expect number? :asfd) :b 4} 9)))
   (is (= {:a 3 :b 4} (either {:a (expect number? 3) :b 4} 9))))
+
+(deftest utilites
+  (is (not (defined? (expect number? :a))))
+  (is (true? (undefined? (expect number? :a))))
+  (is (true? (defined? (expect number? 9))))
+  (is (either (true? (but (expect number? :a)))
+              false)))
