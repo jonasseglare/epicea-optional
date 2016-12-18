@@ -50,6 +50,11 @@
     (is (= 20 (either (if (optionally true true) (optionally true 20) 19) :bad)))
     (is (= :bad (either (if (optionally true true) (optionally false 20) 19) :bad)))))
 
+(deftest do-test
+  (testing "do form"
+    (is (= 2 (either (do (optionally true 1) 2) nil)))
+    (is (nil? (either (do (optionally false 1) 2) nil)))))
+
 ;(defn add-3-expect [x]
 ;  (either (+ 3 (expect number? x))
 ;          nil))

@@ -20,7 +20,6 @@
                       :bindings (spec/spec ::bindings)
                       :forms ::forms))
 
-
 (declare compile-sub)
 
 (defn dissoc-many [m symbols]
@@ -46,7 +45,7 @@
 (defn optionally-sym? [f]
   (or (= 'optionally f) (= `optionally f)))
 
-(def special-forms {'if :if
+(def special-forms {'if :if ;; OK
                     'do :do
                     'loop :loop
                     'var :var
@@ -137,11 +136,41 @@
         (cb m `(~(first x) ~@arg-list)))
       cb))))
 
+(defn compile-let-sub [m x cb]
+  (cb m x))
+
+(defn compile-let [m x0 cb]
+  (let [x (spec/conform ::let-form x0)]
+    (if (= x ::spec/invalid)
+      (error (spec/explain ::let-form x0))
+      (compile-let-sub m x cb))))
+
+(defn compile-do-sub [m forms cb]
+  (cond
+    (empty? forms) (cb m nil)
+    (= 1 (count forms)) (compile-sub m (first forms) cb)
+    :default 
+    (compile-sub 
+     m (first forms)
+     (fn [m x]
+       (wrap-sub-expr 
+        m [x] 
+        (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
+        cb)))))
+
+    
+    
+
+(defn compile-do [m x cb]
+  (compile-do-sub m (rest x) cb))
+
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
     (cond
       (= k :if) (compile-if m x cb)
+      (= k :do) (compile-do m x cb)
+      (= k :let) (compile-let m x cb)
       (contains? special-forms f) (cb m x)
       :default (compile-fun-call m x cb))))
 
