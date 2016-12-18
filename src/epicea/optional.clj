@@ -334,6 +334,7 @@
       :default (compile-other-form m x cb))))
 
 (defn compile-sub [m x cb]
+  (println "Compile sub on " x)
   (cond
     (seq? x) (compile-seq m x cb)
     :default (cb m x)))
