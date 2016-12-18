@@ -45,7 +45,6 @@
                      :fn-name (spec/? ::fn-name)
                      :fn-arities (spec/* ::fn-arity)))
 
-
 (declare compile-sub)
 
 (defn dissoc-many [m symbols]
@@ -84,9 +83,10 @@
                     'var :var ;; OK
                     'monitor-enter :monitor-enter ;; OK
                     'monitor-exit :monitor-exit ;; OK
-                    'fn* :fn
+                    'fn* :fn ;; OK
                     'try :try
                     'catch :catch
+                    'quote :quote
                     })
 
 (defn error [& s]
@@ -311,6 +311,13 @@
       (error (spec/explain ::fn-form x))
       (compile-fn-sub m x cb))))
 
+(defn compile-try [m x cb]
+  (println "Correct treatment of try/catch is currently not implemented")
+  (cb m x))
+
+(defn compile-quote [m x cb]
+  (cb m x))
+
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
@@ -320,6 +327,8 @@
       (= k :let) (compile-let m x cb)
       (= k :loop) (compile-loop m x cb)
       (= k :fn) (compile-fn m x cb)
+      (= k :try) (compile-try m x cb)
+      (= k :quote) (compile-quote m x cb)
 
       ;; recur, throw, monitor-enter, monitor-exit:
       (contains? special-forms f) (compile-fun-call m x cb) 

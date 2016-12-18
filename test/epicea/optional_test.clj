@@ -101,3 +101,5 @@
                              :not-good))))))
 
 
+(deftest quote-test
+  (is (= 'a (either (let [a (expect number? :a)] 'a)))))
