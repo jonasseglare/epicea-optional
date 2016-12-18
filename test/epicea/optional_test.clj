@@ -106,4 +106,8 @@
 
 (deftest try-catch-finally
   (is (= 9 (either (try 9))))
-  (is (= :bad (either (try (assert false) (catch Throwable x :bad))))))
+  (is (= :bad (either (try (assert false) (catch Throwable x :bad)))))
+  (is (= :really-bad
+         (either (try (assert false) 
+                      (catch java.lang.ArrayIndexOutOfBoundsException x :bad) 
+                      (finally :really-bad))))))

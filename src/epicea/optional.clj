@@ -352,7 +352,7 @@
 (defn compile-catch-forms [m forms]
   (map #(compile-catch-form m %) forms))
 
-(defn compile-finally-form [m x cb]
+(defn compile-finally-form [m x]
   (update-in 
    x [:forms]
    (fn [forms]
