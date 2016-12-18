@@ -157,22 +157,11 @@
                    (dissoc m symbol))
                rb cb)))))))
 
-
 (defn compile-let-sub [m bindings forms cb]
-  (if (empty? bindings)
-    (compile-sub
-     m `(do ~@forms) cb)
-    (let [[{:keys [symbol expr]} & rb] bindings]
-      (compile-sub 
-       m expr
-       (fn [m x]
-         `(let [~symbol ~x]
-            ~(compile-let-sub
-                 (if (contains? m x)
-                   (assoc m symbol (get m x))
-                   (dissoc m symbol))
-               rb forms cb)))))))
-              
+  (compile-bindings
+   m bindings
+   (fn [m]
+     (compile-sub m `(do ~@forms) cb))))              
                 
 
 (defn compile-let [m x0 cb]
