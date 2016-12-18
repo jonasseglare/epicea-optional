@@ -153,7 +153,7 @@
          `(let [~symbol ~x]
             ~(compile-let-sub
                  (if (contains? m x)
-                   (assoc m (get m x))
+                   (assoc m symbol (get m x))
                    (dissoc m symbol))
                rb forms cb)))))))
               

@@ -59,6 +59,14 @@
                           :bad)))
       (is (deref x)))))
 
+
+(deftest let-test
+  (testing "let form"
+    (is (= 7 (either (let [a 3] (+ a 4)))))
+    (is (= 4 (either (let [a (optionally false 3) b 4] (either a b)))))
+    (is (= 19 (either (let [a (optionally false 3) b (* 2 a) c 19] (either b c)))))
+    (is (= 6 (either (let [a (optionally true 3) b (* 2 a) c 19] (either b c)))))))
+
 ;(defn add-3-expect [x]
 ;  (either (+ 3 (expect number? x))
 ;          nil))
