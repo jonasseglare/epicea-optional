@@ -29,9 +29,9 @@ nil
 
 ## Discussion
 
-Clojure functions frequently return nil as a result to signal the absence of a value. Checking the return value of every computation is a lot of work. This library aims at taking away some of that pain by providing control flow utilites and the concept of *optional* expressions that are only true if a condition holds. And consequently, any computation that depends on an optional expression becomes itself an optional expression. The ```either``` macro can then be used to choose the first defined value from a set of optional expressions.
+Clojure functions frequently return nil as a result to signal the absence of a value. Checking the return value of every computation before it is being used in the next computation is a lot of work. This library aims at taking away some of that pain by providing control flow utilites and the concept of *optional* expressions that are only true if a condition holds. And consequently, any computation that depends on an optional expression becomes itself an optional expression. The ```either``` macro can then be used to choose the first defined value from a set of optional expressions.
 
-The concept of optionals is also present in other languages, such as Swift, which also provides some control flow constructs to make programming with optionals easier, such as optional chaining. With this libary, optionals can appear anywhere in an expression and is not limited in the same way as it is in Swift.
+The concept of optionals is also present in other languages, such as Swift, which also provides some control flow constructs to make programming with optionals easier, such as optional chaining. With this library, optionals can appear anywhere in an expression and is not limited in the same way as it is in Swift.
 
 Another point is that it may facilitate to use only return values to communicate the result of a computation, where exceptions otherwise would be used. Because the exceptional flow resulting from exceptions can be very hard to follow, I try to avoid them and only use return values. Exceptions can still be useful though for indicating bugs, e.g. through assertions.
 
