@@ -36,7 +36,7 @@
 
 (spec/def ::fn-arity (spec/spec
                       (spec/cat
-                       :fn-args ::fn-args
+                       :args ::fn-args
                        :forms ::forms)))
 
 
@@ -294,6 +294,7 @@
   (update-in
    x [:forms]
    (fn [forms]
+     (println "COMPILE FN ARITY ON " x m)
      [(compile-sub (dissoc-many m (:args x))
                    `(do ~@forms) return-from-fn)])))
 
@@ -306,7 +307,6 @@
 
 (defn compile-fn [m x0 cb]
   (let [x (spec/conform ::fn-form x0)]
-    (println "Compile-fn on " x0)
     (if (= ::spec/invalid x)
       (error (spec/explain ::fn-form x))
       (compile-fn-sub m x cb))))
@@ -334,7 +334,6 @@
       :default (compile-other-form m x cb))))
 
 (defn compile-sub [m x cb]
-  (println "Compile sub on " x)
   (cond
     (seq? x) (compile-seq m x cb)
     :default (cb m x)))
