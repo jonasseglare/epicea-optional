@@ -75,11 +75,6 @@
 
 
 (deftest loop-test
-  (either (loop [a (expect number? 3)] (* 2 a)) :b))
-
-(comment
-  (deftest loop-test
-    (testing "loops"
-      (is (= 7 (either (loop [a 3] (+ a 4)) nil)))
-      (is (= :b (either (loop [a 3] (expect number? :a)) :b)))
-      (is (= 119 (either (loop [a 3] (expect number? 119)) :b))))))
+  (is (= 6 (either (loop [a (expect number? 3)] (* 2 a)) :b)))
+  (is (= 15 (either (loop [a (expect number? 5) sum 0] 
+                      (if (= a 0) sum (recur (- a 1) (+ sum a)))) nil))))

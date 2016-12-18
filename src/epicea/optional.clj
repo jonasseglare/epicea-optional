@@ -236,7 +236,7 @@
 (defn return-from-loop [m expr]
   (println "RETURN FROM LOOP" expr m)
   (if (contains? m expr)
-    (error "Loop result values may not be optional")
+    (error "Loop result values may not be optional. Consider expording it using 'export'.")
     expr))
 
 (defn compile-loop-sub [m x cb]
