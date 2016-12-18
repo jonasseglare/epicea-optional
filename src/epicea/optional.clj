@@ -45,7 +45,8 @@
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
   (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
-      (cb m (cb-subexpr m))
+      ;(cb m (cb-subexpr m))
+      (cb-subexpr m)
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
 
@@ -208,6 +209,13 @@
         [s s]))
     bindings)))
 
+
+(defn return-from-loop [m expr] 
+  (println "Received this: " expr "and map" m)
+  (if (contains? m expr)
+    `(if ~(get m expr) (vector ~expr))
+    `(vector ~expr)))
+
 (defn compile-loop-sub [m x cb]
   (let [raw-sym (gensym)
         test-sym (gensym)
@@ -222,11 +230,7 @@
                 (loop ~(make-loop-bindings bindings)
                   ~(compile-sub 
                     (dissoc-many m test-symbols) `(do ~@(:forms x))
-                    (fn [m expr] 
-                      (println "Received this: " expr "and map" m)
-                      (if (contains? m expr)
-                        `(if ~(get m expr) (vector ~expr))
-                        `(vector ~expr))))))
+                    return-from-loop)))
                 ~test-sym (vector? ~raw-sym)
                 ~loop-sym (first ~raw-sym)]
           ~(cb (assoc m loop-sym test-sym) loop-sym))))))
@@ -234,6 +238,7 @@
           
 
 (defn compile-loop [m x0 cb]
+  (println "COMPILE LOOP:" x0)
   (let [x (spec/conform ::loop-form x0)]
     (if (= x ::spec/invalid)
       (error (spec/explain ::loop-form x0))
