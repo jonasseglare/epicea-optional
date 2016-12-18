@@ -200,6 +200,14 @@
       (compile-fun-call m x cb)
       (compile-sub m expanded cb))))
 
+(defn make-loop-bindings [bindings]
+  (vec
+   (mapcat 
+    (fn [binding]
+      (let [s (:symbol binding)]
+        [s s]))
+    bindings)))
+
 (defn compile-loop-sub [m x cb]
   (let [raw-sym (gensym)
         test-sym (gensym)
@@ -210,16 +218,17 @@
      m (:bindings x)
      (fn [m]
        `(let [~raw-sym
-              `(if `(and ~@test-symbols)
-                 (loop ~(make-loop-bindings bindings)
-                   ~(compile-sub 
-                     (dissoc-many m test-symbols) (:forms x) 
-                     (fn [m expr] 
-                       (if (contains? m expr)
-                         `(if ~(get m expr) [expr])
-                         `[expr]))))
-                 ~test-sym (vector? raw-sym)
-                 ~loop-sym (first ~raw-sym))]
+              (if (and ~@test-symbols)
+                (loop ~(make-loop-bindings bindings)
+                  ~(compile-sub 
+                    (dissoc-many m test-symbols) `(do ~@(:forms x))
+                    (fn [m expr] 
+                      (println "Received this: " expr "and map" m)
+                      (if (contains? m expr)
+                        `(if ~(get m expr) (vector ~expr))
+                        `(vector ~expr))))))
+                ~test-sym (vector? ~raw-sym)
+                ~loop-sym (first ~raw-sym)]
           ~(cb (assoc m loop-sym test-sym) loop-sym))))))
           
           
@@ -250,6 +259,7 @@
       :default (compile-other-form m x cb))))
 
 (defn compile-sub [m x cb]
+  (println "COMPILE SUB: " x)
   (cond
     (seq? x) (compile-seq m x cb)
     :default (cb m x)))
