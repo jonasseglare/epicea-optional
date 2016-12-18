@@ -73,6 +73,10 @@
     (is (= 3 (either (expect number? 3) 4)))
     (is (= 4 (either (expect number? :not-a-number) 4)))))
 
+
+(deftest loop-test
+  (testing "loops"
+    (is (= 7 (either (loop [a 3] (+ a 4)) nil)))))
 ;(defn add-3-expect [x]
 ;  (either (+ 3 (expect number? x))
 ;          nil))

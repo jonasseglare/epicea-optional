@@ -45,7 +45,7 @@
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
   (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
-      ;(cb m (cb-subexpr m))
+      ;(cb m (cb-subexpr m)) ;; Probably not right...
       (cb-subexpr m)
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
