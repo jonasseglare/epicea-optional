@@ -11,6 +11,24 @@
 
 (declare compile-sub)
 
+(defn dissoc-many [m symbols]
+  (reduce dissoc m symbols))
+
+(defn wrap-dependent-sub-expr [symbols m cb-subexpr cb]
+  (let [val-sym (gensym)
+        test-sym (gensym)]
+    `(let [~test-sym (and ~@symbols)
+           ~val-sym (if ~test-sym ~(cb-subexpr (dissoc-many m symbols)))]
+       ~(cb (assoc m val-sym test-sym) val-sym))))
+
+
+(defn wrap-sub-expr [m arg-list cb-subexpr cb]
+  (let [symbols (filter identity (map #(get m %) arg-list))]
+    (if (empty? symbols)
+      (cb m (cb-subexpr m))
+      (wrap-dependent-sub-expr
+       symbols m cb-subexpr cb))))
+
 (defn either-sym? [f]
   (or (= 'either f) (= `either f)))
 
@@ -71,13 +89,16 @@
       (error "optionally expects two arguments but got " x))))
 
  (defn compile-if-sub [m x cb]
-   (cb m x))
-;;   (compile-sub 
-;;    m (:test x)
-;;    (fn [m test-expr]
-     
-
-     
+   (compile-sub 
+    m (:test x)
+    (fn [m test-expr]
+      (wrap-sub-expr 
+       m [test-expr]
+       (fn [m]
+         `(if ~test-expr
+            ~(compile-sub m (:on-true x) cb)
+            ~(compile-sub m (:on-false x) cb))) 
+       cb))))
 
 (defn compile-if [m x0 cb]
   (let [x (spec/conform ::if-form x0)]
@@ -93,33 +114,21 @@
      (fn [m expr]
        (compile-arg-list 
         (conj acc expr)
-        m
-        (rest args) cb)))))
-
-(defn dissoc-many [m symbols]
-  (reduce dissoc m symbols))
-
-(defn wrap-arg-check [m arg-list cb]
-  (let [symbols (filter identity (map #(get m %) arg-list))]
-    (if (empty? symbols)
-      (cb m)
-      `(if (and ~@symbols)
-         ~(cb (dissoc-many m symbols))))))
+        m (rest args) cb)))))
 
 (defn compile-fun-call [m x cb]
   (compile-arg-list 
    [] m (rest x)
    (fn [m arg-list]
-     (wrap-arg-check 
+     (wrap-sub-expr 
       m arg-list
       (fn [m]
-        (cb m `(~(first x) ~@arg-list)))))))
+        (cb m `(~(first x) ~@arg-list)))
+      cb))))
 
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
-    (println "ANY SPECIAL FORM?" k)
-    (println "COMPILE OTHER FORM:" x "with map" m)
     (cond
       (= k :if) (compile-if m x cb)
       (contains? special-forms f) (cb m x)
