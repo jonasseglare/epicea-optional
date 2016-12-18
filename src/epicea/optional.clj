@@ -56,9 +56,9 @@
   (or (= 'optionally f) (= `optionally f)))
 
 (def special-forms {'if :if ;; OK
-                    'do :do
-                    'let* :let
-                    'loop* :loop
+                    'do :do ;; OK
+                    'let* :let ;; OK
+                    'loop* :loop ;; OK
                     'recur :recur
                     'fn :fn
                     'throw :throw
@@ -234,13 +234,11 @@
             ~(cb (assoc m loop-sym test-sym) loop-sym)))))))
 
 (defn return-from-loop [m expr]
-  (println "RETURN FROM LOOP" expr m)
   (if (contains? m expr)
     (error "Loop result values may not be optional. Consider expording it using 'export'.")
     expr))
 
 (defn compile-loop-sub [m x cb]
-  (println "COMPILE LOOP SUB " m x)
   (let [raw-sym (gensym)
         test-sym (gensym)
         loop-sym (gensym)
@@ -250,7 +248,6 @@
     (compile-bindings
      m (:bindings x)
      (fn [m]
-       (println "Compiled bindings: " m)
        `(let [~test-sym (and ~@test-symbols)
               ~loop-sym
               (if ~test-sym
