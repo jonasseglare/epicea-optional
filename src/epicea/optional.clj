@@ -59,15 +59,16 @@
                     'do :do ;; OK
                     'let* :let ;; OK
                     'loop* :loop ;; OK
-                    'recur :recur
+                    'recur :recur ;; OK
+                    'throw :throw ;; OK
+                    'def :def ;; OK
+                    'var :var ;; OK
+                    'monitor-enter :monitor-enter ;; OK
+                    'monitor-exit :monitor-exit ;; OK
                     'fn :fn
-                    'throw :throw
                     'try :try
-                    'def :def
-                    'var :var
                     'catch :catch
-                    'monitor-enter :monitor-enter
-                    'monitor-exit :monitor-exit})
+                    })
 
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))

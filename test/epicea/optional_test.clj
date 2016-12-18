@@ -78,3 +78,10 @@
   (is (= 6 (either (loop [a (expect number? 3)] (* 2 a)) :b)))
   (is (= 15 (either (loop [a (expect number? 5) sum 0] 
                       (if (= a 0) sum (recur (- a 1) (+ sum a)))) nil))))
+  
+(deftest def-var-test 
+  (is (= 10 (either (do (def a 10)
+                        (var a)
+                        a)
+                    nil))))
+
