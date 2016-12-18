@@ -55,7 +55,7 @@
 (def special-forms {'if :if ;; OK
                     'do :do
                     'let* :let
-                    'loop :loop
+                    'loop* :loop
                     'recur :recur
                     'fn :fn
                     'throw :throw
@@ -143,6 +143,21 @@
         (cb m `(~(first x) ~@arg-list)))
       cb))))
 
+(defn compile-bindings [m bindings cb]
+  (if (empty? bindings)
+    (cb m)
+    (let [[{:keys [symbol expr]} & rb] bindings]
+      (compile-sub 
+       m expr
+       (fn [m x]
+         `(let [~symbol ~x]
+            ~(compile-bindings
+                 (if (contains? m x)
+                   (assoc m symbol (get m x))
+                   (dissoc m symbol))
+               rb cb)))))))
+
+
 (defn compile-let-sub [m bindings forms cb]
   (if (empty? bindings)
     (compile-sub
@@ -187,12 +202,14 @@
   (compile-do-sub m (rest x) cb))
 
 (defn compile-function-or-macro-call [m x cb]
+  (println "Compile function or macro call on " x)
   (let [expanded (macroexpand x)]
     (if (= expanded x)
       (compile-fun-call m x cb)
       (compile-sub m expanded cb))))
 
 (defn compile-loop [m x0 cb]
+  (println "Compile LOOP on " x0 "with" m)
   (cb m x0))
 
 (defn compile-other-form [m x cb]
