@@ -17,7 +17,7 @@
 
 (spec/def ::let-form (spec/cat
                       :let-symbol ::let-symbol
-                      :bindings ::bindings
+                      :bindings (spec/spec ::bindings)
                       :forms ::forms))
 
 (declare compile-sub)
@@ -138,6 +138,8 @@
       cb))))
 
 (defn compile-let-sub [m bindings forms cb]
+  (println "bindings: " bindings)
+  (println "forms: " forms)
   (cb m `(do ~@forms)))
 
 (defn compile-let [m x0 cb]
