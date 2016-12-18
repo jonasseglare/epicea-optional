@@ -15,10 +15,10 @@
 (spec/def ::forms (spec/* ::form))
 (spec/def ::let-symbol (constantly true)); #(= `let %))
 
-(spec/def ::let-form (spec/cat
-                      :let-symbol ::let-symbol
-                      :bindings (spec/spec ::bindings)
-                      :forms ::forms))
+(spec/def ::basic-let-form (spec/cat
+                            :let-symbol ::let-symbol
+                            :bindings (spec/spec ::bindings)
+                            :forms ::forms))
 
 (declare compile-sub)
 
@@ -49,7 +49,8 @@
                     'do :do
                     'loop :loop
                     'var :var
-                    `let :let
+                    ;`let :let
+                    ;'let :let
                     'let :let
                     'fn :fn
                     'throw :throw
@@ -138,14 +139,16 @@
       cb))))
 
 (defn compile-let-sub [m bindings forms cb]
-  (println "bindings: " bindings)
-  (println "forms: " forms)
-  (cb m `(do ~@forms)))
+  (if (empty? bindings)
+    (compile-sub
+     m `(do ~@forms) cb)
+    (let [[b & rb] bindings]
+      (cb m `(do ~@forms)))))
 
 (defn compile-let [m x0 cb]
-  (let [x (spec/conform ::let-form x0)]
+  (let [x (spec/conform ::basic-let-form x0)]
     (if (= x ::spec/invalid)
-      (error (spec/explain ::let-form x0))
+      (error (spec/explain ::basic-let-form x0))
       (compile-let-sub m 
         (:bindings x) (:forms x) cb))))
 
