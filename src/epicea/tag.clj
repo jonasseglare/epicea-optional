@@ -19,13 +19,16 @@
 
 
 ;;; Convenience definitions  
-(def tag-value (tag :value))
+(def tag-success (tag :success))
+(def tag-error (tag :error))
 (def undefined (tag :undefined nil))
-(def value? (tagged? :value))
+(def success? (tagged? :success))
+(def error? (tagged? :error))
 
+;; Utilites for passing optional values between functions
 (defmacro wrap [expr]
-  `(epicea.optional/either (tag-value ~expr) undefined))
+  `(epicea.optional/either (tag-success ~expr) undefined))
 
 (defmacro unwrap 
-  ([expr] `(value (epicea.optional/expect value? ~expr)))
+  ([expr] `(value (epicea.optional/expect success? ~expr)))
   ([tag expr] `(value (epicea.optional/expect (tagged? ~tag) ~expr))))
