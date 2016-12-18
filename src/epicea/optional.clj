@@ -27,6 +27,25 @@
                        :bindings ::bindings
                        :forms ::forms))
 
+(spec/def ::fn-symbol (constantly true))
+(spec/def ::fn-name symbol?)
+
+(spec/def ::fn-args (spec/spec
+                     (spec/coll-of symbol?)))
+
+
+(spec/def ::fn-arity (spec/spec
+                      (spec/cat
+                       :fn-args ::fn-args
+                       :forms ::forms)))
+
+
+(spec/def ::fn-form (spec/cat
+                     :fn-symbol ::fn-symbol
+                     :fn-name (spec/? ::fn-name)
+                     :fn-arities (spec/* ::fn-arity)))
+
+
 (declare compile-sub)
 
 (defn dissoc-many [m symbols]
@@ -65,7 +84,7 @@
                     'var :var ;; OK
                     'monitor-enter :monitor-enter ;; OK
                     'monitor-exit :monitor-exit ;; OK
-                    'fn :fn
+                    'fn* :fn
                     'try :try
                     'catch :catch
                     })
@@ -266,6 +285,31 @@
       (compile-loop-sub 
        m x cb))))
 
+(defn return-from-fn [m x]
+  (if (contains? m x)
+    (error "The return value of an fn must not be optional. Consider exporting it using 'export'.")
+    x))
+
+(defn compile-fn-arity [m x]
+  (update-in
+   x [:forms]
+   (fn [forms]
+     [(compile-sub m `(do ~@forms) return-from-fn)])))
+
+(defn compile-fn-sub [m x cb]
+  (cb m (spec/unform
+         ::fn-form
+         (update-in
+          x [:fn-arities]
+          (fn [arities] (map #(compile-fn-arity m %) arities))))))
+
+(defn compile-fn [m x0 cb]
+  (let [x (spec/conform ::fn-form x0)]
+    (println "Compile-fn on " x0)
+    (if (= ::spec/invalid x)
+      (error (spec/explain ::fn-form x))
+      (compile-fn-sub m x cb))))
+
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
@@ -274,6 +318,7 @@
       (= k :do) (compile-do m x cb)
       (= k :let) (compile-let m x cb)
       (= k :loop) (compile-loop m x cb)
+      (= k :fn) (compile-fn m x cb)
 
       ;; recur, throw, monitor-enter, monitor-exit:
       (contains? special-forms f) (compile-fun-call m x cb) 

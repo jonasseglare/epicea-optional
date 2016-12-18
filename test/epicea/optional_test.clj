@@ -85,3 +85,7 @@
                         a)
                     nil))))
 
+(deftest fn-test
+  (is (= 7 ((either (fn rulle [a] (+ a 3))) 4)))
+  (is (= 7 ((either (fn [a] (+ a 3))) 4))))
+
