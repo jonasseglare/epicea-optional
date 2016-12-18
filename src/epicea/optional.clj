@@ -340,8 +340,6 @@
       (error (spec/explain ::fn-form x))
       (compile-fn-sub m x cb))))
 
-
-
 (defn compile-catch-form [m x]
   (update-in 
    x [:forms]
@@ -352,7 +350,7 @@
        (return-defined "Forms in catch must not be optional"))])))
 
 (defn compile-catch-forms [m forms]
-  (map #(compile-sub m %) forms))
+  (map #(compile-catch-form m %) forms))
 
 (defn compile-finally-form [m x cb]
   (update-in 

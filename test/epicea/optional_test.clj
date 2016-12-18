@@ -105,4 +105,5 @@
   (is (= '(a) (either (let [a (expect number? :a)] '(a))))))
 
 (deftest try-catch-finally
-  (is (= 9 (either (try 9)))))
+  (is (= 9 (either (try 9))))
+  (is (= :bad (either (try (assert false) (catch Throwable x :bad))))))
