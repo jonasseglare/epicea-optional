@@ -8,17 +8,24 @@
                               :on-true ::expr
                               :on-false (spec/? ::expr)))
 
-(spec/def ::binding (spec/cat :symbol simple-symbol?
+(spec/def ::binding (spec/cat :symbol symbol?
                               :expr ::expr))
-(spec/def ::bindings (spec/* ::binding))
+(spec/def ::bindings (spec/spec (spec/* ::binding)))
 (spec/def ::form (constantly true))
 (spec/def ::forms (spec/* ::form))
 (spec/def ::let-symbol (constantly true)); #(= `let %))
 
 (spec/def ::basic-let-form (spec/cat
                             :let-symbol ::let-symbol
-                            :bindings (spec/spec ::bindings)
+                            :bindings ::bindings
                             :forms ::forms))
+
+(spec/def ::loop-symbol (constantly true))
+
+(spec/def ::loop-form (spec/cat
+                       :loop-symbol ::loop-symbol
+                       :bindings ::bindings
+                       :forms ::forms))
 
 (declare compile-sub)
 
@@ -185,6 +192,9 @@
       (compile-fun-call m x cb)
       (compile-sub m expanded cb))))
 
+(defn compile-loop [m x0 cb]
+  (cb m x0))
+
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
@@ -192,6 +202,7 @@
       (= k :if) (compile-if m x cb)
       (= k :do) (compile-do m x cb)
       (= k :let) (compile-let m x cb)
+      (= k :loop) (compile-loop m x cb)
       (contains? special-forms f) (cb m x)
       :default (compile-function-or-macro-call m x cb))))
 
