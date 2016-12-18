@@ -52,6 +52,7 @@
                     ;`let :let
                     ;'let :let
                     'let :let
+                    'let* :let
                     'fn :fn
                     'throw :throw
                     'try :try
@@ -88,6 +89,7 @@
   (compile-either-sub m (rest x) cb))
 
 (defn compile-optionally-sub [m [test-expr value-expr] cb]
+  (println "COMPILE OPTIONALLY: " test-expr value-expr)
   (let [t (gensym)
         v (gensym)]
     `(let [~t ~test-expr
@@ -156,6 +158,7 @@
                 
 
 (defn compile-let [m x0 cb]
+  (println "COMPILE LET:" x0)
   (let [x (spec/conform ::basic-let-form x0)]
     (if (= x ::spec/invalid)
       (error (spec/explain ::basic-let-form x0))
@@ -182,6 +185,7 @@
   (compile-do-sub m (rest x) cb))
 
 (defn compile-function-or-macro-call [m x cb]
+  (println "COMPILE FUNCTION OR MACRO CALL:" x)
   (let [expanded (macroexpand x)]
     (if (= expanded x)
       (compile-fun-call m x cb)
@@ -227,8 +231,8 @@
   (if (contains? special-forms (first x))
     x nil))
 
-;(defmacro expect [test-fun expr]
-;  `(let [esym# ~expr]
-;     (optionally (~test-fun esym#) esym#)))
+(defmacro expect [test-fun expr]
+  `(let [esym# ~expr]
+     (optionally (~test-fun esym#) esym#)))
        
   

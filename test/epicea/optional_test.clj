@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [epicea.optional :refer 
              [either optionally test-special
-              compile-top]] :reload-all))
+              compile-top expect]] :reload-all))
 
 (deftest basic
   (testing "Basic testing"
@@ -66,6 +66,11 @@
     (is (= 4 (either (let [a (optionally false 3) b 4] (either a b)))))
     (is (= 19 (either (let [a (optionally false 3) b (* 2 a) c 19] (either b c)))))
     (is (= 6 (either (let [a (optionally true 3) b (* 2 a) c 19] (either b c)))))))
+
+(deftest expect-test
+  (testing "expect"
+    (is (= 3 (either (expect number? 3) 4)))
+    (is (= 4 (either (expect number? :not-a-number) 4)))))
 
 ;(defn add-3-expect [x]
 ;  (either (+ 3 (expect number? x))
