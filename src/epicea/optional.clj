@@ -22,8 +22,8 @@
        ~(cb (assoc m val-sym test-sym) val-sym))))
 
 
-(defn wrap-sub-expr [m arg-list cb-subexpr cb]
-  (let [symbols (filter identity (map #(get m %) arg-list))]
+(defn wrap-sub-expr [m dependencies cb-subexpr cb]
+  (let [symbols (filter identity (map #(get m %) dependencies))]
     (if (empty? symbols)
       (cb m (cb-subexpr m))
       (wrap-dependent-sub-expr
