@@ -45,8 +45,8 @@
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
   (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
-      ;(cb m (cb-subexpr m)) ;; Probably not right...
-      (cb-subexpr m)
+      (cb m (cb-subexpr m)) ;; Probably not right...
+      ;(cb-subexpr m)
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
 
@@ -209,30 +209,57 @@
     bindings)))
 
 
-(defn return-from-loop [m expr] 
+(comment ;; OLD VERSION
+  (defn return-from-loop [m expr] 
+    (if (contains? m expr)
+      `(if ~(get m expr) (vector ~expr))
+      `(vector ~expr)))
+
+  (defn compile-loop-sub [m x cb]
+    (let [raw-sym (gensym)
+          test-sym (gensym)
+          loop-sym (gensym)
+          bindings (:bindings x)
+          test-symbols (get-optional-test-symbols m (map :symbol bindings))]
+      (compile-bindings
+       m (:bindings x)
+       (fn [m]
+         `(let [~raw-sym
+                (if (and ~@test-symbols)
+                  (loop ~(make-loop-bindings bindings)
+                    ~(compile-sub 
+                      (dissoc-many m test-symbols) `(do ~@(:forms x))
+                      return-from-loop)))
+                ~test-sym (vector? ~raw-sym)
+                ~loop-sym (first ~raw-sym)]
+            ~(cb (assoc m loop-sym test-sym) loop-sym)))))))
+
+(defn return-from-loop [m expr]
+  (println "REETURN FROM LOOP")
   (if (contains? m expr)
-    `(if ~(get m expr) (vector ~expr))
-    `(vector ~expr)))
+    (error "Loop result values may not be optional")
+    expr))
 
 (defn compile-loop-sub [m x cb]
+  (println "COMPILE LOOP SUB " m x)
   (let [raw-sym (gensym)
         test-sym (gensym)
         loop-sym (gensym)
         bindings (:bindings x)
-        test-symbols (get-optional-test-symbols m (map :symbol bindings))]
+        symbols (map :symbol bindings)
+        test-symbols (get-optional-test-symbols m symbols)]
     (compile-bindings
      m (:bindings x)
      (fn [m]
-       `(let [~raw-sym
-              (if (and ~@test-symbols)
+       (println "Compiled bindings: " m)
+       `(let [~test-sym (and ~@test-symbols)
+              ~loop-sym
+              (if ~test-sym
                 (loop ~(make-loop-bindings bindings)
                   ~(compile-sub 
-                    (dissoc-many m test-symbols) `(do ~@(:forms x))
-                    return-from-loop)))
-                ~test-sym (vector? ~raw-sym)
-                ~loop-sym (first ~raw-sym)]
+                    (dissoc-many m symbols) `(do ~@(:forms x))
+                    return-from-loop)))]
           ~(cb (assoc m loop-sym test-sym) loop-sym))))))
-          
           
 
 (defn compile-loop [m x0 cb]
