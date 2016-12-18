@@ -7,8 +7,6 @@ Summary of three most important commands.
 * Use ```(expect fun? expr)``` to define an optional expression ```expr``` whenever ```(fun? expr)``` is true.
 * Use ```(optionally pred expr)``` to define an optional expression ```expr``` whenever ```pred``` is true.
 
-*See the unittests* for a rich set of examples of how this library can be used.
-
 ## Usage
 
 Example of BMI calculator:
@@ -26,6 +24,7 @@ Example of BMI calculator:
 (compute-bmi {:height 1.73})
 nil
 ```
+*See the unittests* for a rich set of examples of how this library can be used.
 ## Overview
 * Use ```(either expr*)``` to choose the first defined value among a set of optional expressions.
 * Use ```(expect fun? expr)``` to define an optional value if a function when applied to an expression returns true.
