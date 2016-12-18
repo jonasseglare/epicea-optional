@@ -273,7 +273,10 @@
       (= k :do) (compile-do m x cb)
       (= k :let) (compile-let m x cb)
       (= k :loop) (compile-loop m x cb)
-      (contains? special-forms f) (cb m x)
+
+      ;; recur, throw, monitor-enter, monitor-exit:
+      (contains? special-forms f) (compile-fun-call m x cb) 
+
       :default (compile-function-or-macro-call m x cb))))
 
 (defn compile-seq [m x cb]
