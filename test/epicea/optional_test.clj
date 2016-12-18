@@ -40,7 +40,7 @@
 
 
 (deftest if-test
-  (testing "if statement"
+  (testing "if form"
     (is (= 4 (either (if 3 4 5))))
     (is (= :bad (either (if (optionally false 3) 4 5) :bad)))
     (is (= 4 (either (if (optionally true 3) 4 5) :bad)))

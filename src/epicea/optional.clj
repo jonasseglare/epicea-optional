@@ -143,10 +143,6 @@
     (compile-sub
      m `(do ~@forms) cb)
     (let [[{:keys [symbol expr]} & rb] bindings]
-      (println "bindings =" bindings)
-      (println "symbol =" symbol)
-      (println "expr =" expr)
-      (println "rb =" rb)
       (compile-sub 
        m expr
        (fn [m x]
