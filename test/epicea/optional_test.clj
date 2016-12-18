@@ -65,7 +65,8 @@
     (is (= 7 (either (let [a 3] (+ a 4)))))
     (is (= 4 (either (let [a (optionally false 3) b 4] (either a b)))))
     (is (= 19 (either (let [a (optionally false 3) b (* 2 a) c 19] (either b c)))))
-    (is (= 6 (either (let [a (optionally true 3) b (* 2 a) c 19] (either b c)))))))
+    (is (= 6 (either (let [a (optionally true 3) b (* 2 a) c 19] (either b c)))))
+    (is (= 4 (either (let [a (expect number? :a)] (let [a 4] a)))))))
 
 (deftest expect-test
   (testing "expect"
