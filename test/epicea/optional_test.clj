@@ -115,3 +115,9 @@
 (deftest vector-test
   (is (= [1 2 3] (either [1 (expect number? 2) 3] 4)))
   (is (= 4 (either [1 (expect number? :a) 3] 4))))
+
+(deftest set-test2
+  (let [k (either #{1 (expect number? 2) 3} 4)]
+    (is (set? k))
+    (is (= #{1 2 3} k)))
+  (is (= 4 (either #{1 (expect number? :a) 3} 4))))

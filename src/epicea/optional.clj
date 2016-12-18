@@ -323,7 +323,6 @@
   (update-in
    x [:forms]
    (fn [forms]
-     (println "COMPILE FN ARITY ON " x m)
      [(compile-sub (dissoc-many m (:args x))
                    `(do ~@forms) return-from-fn)])))
 
@@ -361,7 +360,6 @@
       (return-defined "The finally form cannot be optional")))))
 
 (defn compile-try-sub [m x cb]
-  (println "COMPILE TRY: " x)
   (cb m (spec/unform
          ::try-form
          (merge
@@ -426,10 +424,14 @@
 (defn compile-vector [m x cb]
   (compile-coll m x cb vec))
 
+(defn compile-set [m x cb]
+  (compile-coll m x cb set))
+
 (defn compile-sub [m x cb]
   (cond
     (seq? x) (compile-seq m x cb)
     (vector? x) (compile-vector m x cb)
+    (set? x) (compile-set m x cb)
     :default (cb m x)))
 
 
