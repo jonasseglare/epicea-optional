@@ -37,3 +37,8 @@
     (is (= 7 (add-3 4)))
     (is (nil? (add-3 :a)))
     (is (nil? (add-3 nil)))))
+
+
+;(defn add-3-expect [x]
+;  (either (+ 3 (expect number? x))
+;          nil))

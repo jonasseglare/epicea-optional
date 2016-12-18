@@ -1,4 +1,13 @@
-(ns epicea.optional)
+(ns epicea.optional
+  (:require [clojure.spec :as spec]))
+
+(spec/def ::if-sym #(= `if %))
+(spec/def ::expr (constantly true))
+(spec/def ::if-form (spec/cat :if-sym ::if-sym
+                              :test ::expr
+                              :on-true ::expr
+                              :on-false (spec/? ::expr)))
+
 
 (declare compile-sub)
 
@@ -61,29 +70,41 @@
       (compile-optionally-sub m args cb)
       (error "optionally expects two arguments but got " x))))
 
-(defn compile-if [m x cb]
-  (error "TODO")
-  (cb m x))
+ (defn compile-if-sub [m x cb]
+   (cb m x))
+;;   (compile-sub 
+;;    m (:test x)
+;;    (fn [m test-expr]
+     
+
+     
+
+(defn compile-if [m x0 cb]
+  (let [x (spec/conform ::if-form x0)]
+    (if (= ::spec/invalid x)
+      (error (spec/explain ::if-form x0))
+      (compile-if-sub m x cb))))
 
 (defn compile-arg-list [acc m args cb]
-  (println "Compile arg list on " acc m args cb)
   (if (empty? args)
     (cb m acc)
     (compile-sub 
      m (first args) 
      (fn [m expr]
-       (println "Was called")
        (compile-arg-list 
         (conj acc expr)
         m
         (rest args) cb)))))
 
-(defn wrap-arg-check [m arg-list wrapped]
+(defn dissoc-many [m symbols]
+  (reduce dissoc m symbols))
+
+(defn wrap-arg-check [m arg-list cb]
   (let [symbols (filter identity (map #(get m %) arg-list))]
     (if (empty? symbols)
-      wrapped
+      (cb m)
       `(if (and ~@symbols)
-         ~wrapped))))
+         ~(cb (dissoc-many m symbols))))))
 
 (defn compile-fun-call [m x cb]
   (compile-arg-list 
@@ -91,14 +112,14 @@
    (fn [m arg-list]
      (wrap-arg-check 
       m arg-list
-      (cb m `(~(first x) ~@arg-list))))))
-   
-     
+      (fn [m]
+        (cb m `(~(first x) ~@arg-list)))))))
 
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
-    (println "Got " x " which is has special form" k)
+    (println "ANY SPECIAL FORM?" k)
+    (println "COMPILE OTHER FORM:" x "with map" m)
     (cond
       (= k :if) (compile-if m x cb)
       (contains? special-forms f) (cb m x)
@@ -134,3 +155,8 @@
   (if (contains? special-forms (first x))
     x nil))
 
+;(defmacro expect [test-fun expr]
+;  `(let [esym# ~expr]
+;     (optionally (~test-fun esym#) esym#)))
+       
+  
