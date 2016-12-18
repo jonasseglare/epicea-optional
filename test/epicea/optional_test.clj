@@ -121,3 +121,8 @@
     (is (set? k))
     (is (= #{1 2 3} k)))
   (is (= 4 (either #{1 (expect number? :a) 3} 4))))
+
+(deftest map-test
+  (is (= {:a 3 :b 4} (either {:a 3 :b 4} 9)))
+  (is (= 9 (either {:a (expect number? :asfd) :b 4} 9)))
+  (is (= {:a 3 :b 4} (either {:a (expect number? 3) :b 4} 9))))

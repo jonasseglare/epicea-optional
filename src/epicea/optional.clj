@@ -427,11 +427,30 @@
 (defn compile-set [m x cb]
   (compile-coll m x cb set))
 
+
+(spec/def ::map-entry (spec/cat :key ::expr :value ::expr))
+(spec/def ::map-entries (spec/* ::map-entry))
+
+(defn get-flat-map-data [x]
+  (apply
+   concat
+   (vec x)))
+
+(defn make-map-from-flat-data [data]
+  (let [values (spec/conform ::map-entries data)]
+    (zipmap 
+     (map :key values)
+     (map :value values))))
+
+(defn compile-map [m x cb]
+  (compile-coll m (get-flat-map-data x) cb make-map-from-flat-data))
+
 (defn compile-sub [m x cb]
   (cond
     (seq? x) (compile-seq m x cb)
     (vector? x) (compile-vector m x cb)
     (set? x) (compile-set m x cb)
+    (map? x) (compile-map m x cb)
     :default (cb m x)))
 
 
