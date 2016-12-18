@@ -111,3 +111,7 @@
          (either (try (assert false) 
                       (catch java.lang.ArrayIndexOutOfBoundsException x :bad) 
                       (finally :really-bad))))))
+
+(deftest vector-test
+  (is (= [1 2 3] (either [1 (expect number? 2) 3] 4)))
+  (is (= 4 (either [1 (expect number? :a) 3] 4))))

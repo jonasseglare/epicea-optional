@@ -413,9 +413,20 @@
       (optionally-sym? f) (compile-optionally m x cb)
       :default (compile-other-form m x cb))))
 
+(defn compile-vector [m x cb]
+  (compile-arg-list 
+   [] m x
+   (fn [m arg-list]
+     (wrap-sub-expr 
+      m arg-list
+      (fn [m]
+        (cb m (vec arg-list)))
+      cb))))
+
 (defn compile-sub [m x cb]
   (cond
     (seq? x) (compile-seq m x cb)
+    (vector? x) (compile-vector m x cb)
     :default (cb m x)))
 
 
