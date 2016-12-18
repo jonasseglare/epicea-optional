@@ -39,6 +39,17 @@
     (is (nil? (add-3 nil)))))
 
 
+(deftest if-test
+  (testing "if statement"
+    (is (= 4 (either (if 3 4 5))))
+    (is (= :bad (either (if (optionally false 3) 4 5) :bad)))
+    (is (= 4 (either (if (optionally true 3) 4 5) :bad)))
+    (is (= 5 (either (if (optionally true false) 4 5) :bad)))
+    (is (= :bad (either (if (optionally true false) 4 (optionally false 8)) :bad)))
+    (is (= 8 (either (if (optionally true false) 4 (optionally true 8)) :bad)))
+    (is (= 20 (either (if (optionally true true) (optionally true 20) 19) :bad)))
+    (is (= :bad (either (if (optionally true true) (optionally false 20) 19) :bad)))))
+
 ;(defn add-3-expect [x]
 ;  (either (+ 3 (expect number? x))
 ;          nil))
