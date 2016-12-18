@@ -141,7 +141,6 @@
   (cb m `(do ~@forms)))
 
 (defn compile-let [m x0 cb]
-  (println "GOT LET FORM: " x0)
   (let [x (spec/conform ::let-form x0)]
     (if (= x ::spec/invalid)
       (error (spec/explain ::let-form x0))
@@ -174,10 +173,8 @@
       (compile-sub m expanded cb))))
 
 (defn compile-other-form [m x cb]
-  (println "GOT " x)
   (let [f (first x)
         k (get special-forms f)]
-    (println "special form sym: " k)
     (cond
       (= k :if) (compile-if m x cb)
       (= k :do) (compile-do m x cb)
@@ -186,7 +183,6 @@
       :default (compile-function-or-macro-call m x cb))))
 
 (defn compile-seq [m x cb]
-  (println "Compile seq")
   (let [f (first x)]
     (cond
       (either-sym? f) (compile-either m x cb)
@@ -194,7 +190,6 @@
       :default (compile-other-form m x cb))))
 
 (defn compile-sub [m x cb]
-  (println "COMPILE SUB!" x)
   (cond
     (seq? x) (compile-seq m x cb)
     :default (cb m x)))
