@@ -133,3 +133,12 @@
   (is (true? (defined? (expect number? 9))))
   (is (either (true? (but (expect number? :a)))
               false)))
+
+
+(defn compute-bmi-sub [weight height]
+  (/ weight (* height height)))
+
+(defn compute-bmi [person]
+  (either (compute-bmi-sub (expect number? (:weight person))
+                           (expect number? (:height person)))
+          nil))
