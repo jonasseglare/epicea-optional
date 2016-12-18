@@ -1,7 +1,7 @@
 (ns epicea.optional
   (:require [clojure.spec :as spec]))
 
-(spec/def ::if-sym (constantly true)) ;#(= `if %))
+(spec/def ::if-sym #(= 'if %))
 (spec/def ::expr (constantly true))
 (spec/def ::if-form (spec/cat :if-sym ::if-sym
                               :test ::expr
