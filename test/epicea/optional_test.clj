@@ -26,7 +26,7 @@
             true)))))
 
 (deftest special-syms
-  (is (= 5 (test-special (let [a 3] (+ a 2))))))
+  (is (= 5 (test-special (let* [a 3] (+ a 2))))))
 
 (defn add-3 [x]
   (either (+ 3 (optionally (number? x) x))

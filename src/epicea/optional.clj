@@ -51,7 +51,7 @@
                     'var :var
                     ;`let :let
                     ;'let :let
-                    'let :let
+                    ;'let :let
                     'let* :let
                     'fn :fn
                     'throw :throw
