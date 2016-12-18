@@ -7,7 +7,7 @@ Summary of three most important commands.
 * Use ```(expect fun? expr)``` to define an optional expression ```expr``` whenever ```(fun? expr)``` is true.
 * Use ```(optionally pred expr)``` to define an optional expression ```expr``` whenever ```pred``` is true.
 
-*See the unittest* for a rich set of examples of how this library can be used.
+*See the unittests* for a rich set of examples of how this library can be used.
 
 ## Usage
 
