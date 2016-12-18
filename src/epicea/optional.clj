@@ -413,15 +413,18 @@
       (optionally-sym? f) (compile-optionally m x cb)
       :default (compile-other-form m x cb))))
 
-(defn compile-vector [m x cb]
+(defn compile-coll [m x cb wrapper]
   (compile-arg-list 
    [] m x
    (fn [m arg-list]
      (wrap-sub-expr 
       m arg-list
       (fn [m]
-        (cb m (vec arg-list)))
+        (cb m (wrapper arg-list)))
       cb))))
+
+(defn compile-vector [m x cb]
+  (compile-coll m x cb vec))
 
 (defn compile-sub [m x cb]
   (cond
