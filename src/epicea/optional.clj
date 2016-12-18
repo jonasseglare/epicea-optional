@@ -45,6 +45,32 @@
                      :fn-name (spec/? ::fn-name)
                      :fn-arities (spec/* ::fn-arity)))
 
+(spec/def ::type (constantly true))
+
+(spec/def ::finally-symbol #(= % 'finally))
+(spec/def ::catch-symbol #(= % 'catch))
+
+(spec/def ::catch-form (spec/spec
+                        (spec/cat
+                         :catch-symbol ::catch-symbol
+                         :type ::type
+                         :var-name symbol?
+                         :forms ::forms)))
+
+(spec/def ::finally-form (spec/spec
+                          (spec/cat
+                           :finally-symbol ::finally-symbol
+                           :forms ::forms)))
+
+(spec/def ::non-catch #(and (not (spec/valid? ::catch-form %))
+                            (not (spec/valid? ::finally-form %))))
+
+(spec/def ::try-form (spec/cat
+                      :try-symbol symbol?
+                      :forms (spec/* ::non-catch)
+                      :catch-forms (spec/* ::catch-form)
+                      :finally-form (spec/? ::finally-form)))
+
 (declare compile-sub)
 
 (defn dissoc-many [m symbols]
@@ -206,9 +232,6 @@
         m [x] 
         (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
         cb)))))
-
-    
-    
 
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
