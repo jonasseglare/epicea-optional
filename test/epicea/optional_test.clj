@@ -102,4 +102,4 @@
 
 
 (deftest quote-test
-  (is (= 'a (either (let [a (expect number? :a)] 'a)))))
+  (is (= '(a) (either (let [a (expect number? :a)] '(a))))))
