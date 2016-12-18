@@ -65,14 +65,44 @@
   (error "TODO")
   (cb m x))
 
+(defn compile-arg-list [acc m args cb]
+  (println "Compile arg list on " acc m args cb)
+  (if (empty? args)
+    (cb m acc)
+    (compile-sub 
+     m (first args) 
+     (fn [m expr]
+       (println "Was called")
+       (compile-arg-list 
+        (conj acc expr)
+        m
+        (rest args) cb)))))
+
+(defn wrap-arg-check [m arg-list wrapped]
+  (let [symbols (filter identity (map #(get m %) arg-list))]
+    (if (empty? symbols)
+      wrapped
+      `(if (and ~@symbols)
+         ~wrapped))))
+
+(defn compile-fun-call [m x cb]
+  (compile-arg-list 
+   [] m (rest x)
+   (fn [m arg-list]
+     (wrap-arg-check 
+      m arg-list
+      (cb m `(~(first x) ~@arg-list))))))
+   
+     
+
 (defn compile-other-form [m x cb]
   (let [f (first x)
         k (get special-forms f)]
-    (println "Got " x " which is " k)
+    (println "Got " x " which is has special form" k)
     (cond
       (= k :if) (compile-if m x cb)
       (contains? special-forms f) (cb m x)
-      :default (cb m x))))
+      :default (compile-fun-call m x cb))))
 
 (defn compile-seq [m x cb]
   (let [f (first x)]
@@ -84,7 +114,7 @@
 (defn compile-sub [m x cb]
   (cond
     (seq? x) (compile-seq m x cb)
-    :default x))
+    :default (cb m x)))
 
 
 (defn compile-top [x]

@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [epicea.optional :refer 
              [either optionally test-special
-              compile-top]]))
+              compile-top]] :reload-all))
 
 (deftest basic
   (testing "Basic testing"
@@ -28,3 +28,12 @@
 (deftest special-syms
   (is (= 5 (test-special (let [a 3] (+ a 2))))))
 
+(defn add-3 [x]
+  (either (+ 3 (optionally (number? x) x))
+          nil))
+
+(deftest mini-test
+  (testing "Certain basic aspects"
+    (is (= 7 (add-3 4)))
+    (is (nil? (add-3 :a)))
+    (is (nil? (add-3 nil)))))
