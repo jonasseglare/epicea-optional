@@ -1,9 +1,9 @@
 # epicea-optional
 
-Adds *optional expressions* to Clojure. Using optional expressions and the control flow utilities that goes along with them, we can easily write robust functions that don't break easily for different kinds of data.
+Adds *optional expressions* to Clojure. Using optional expressions and the control flow utilities that goes along with them, we can write robust functions that don't break so easily for different kinds of data.
 
 Summary of three most important commands.
-* Use ```(either expr*)``` to choose the first defined expression among a set of optional expressions.
+* Use ```(either expr*)``` to choose the first defined value from a set of optional expressions.
 * Use ```(expect fun? expr)``` to define an optional expression ```expr``` whenever ```(fun? expr)``` is true.
 * Use ```(optionally pred expr)``` to define an optional expression ```expr``` whenever ```pred``` is true.
 
@@ -22,7 +22,7 @@ Example of BMI calculator:
 (compute-bmi {:weight 74 :height 1.73}) 
 ;; 24.725182932941294
 (compute-bmi {:height 1.73})
-nil
+;;nil
 ```
 *See the unittests* for a rich set of examples of how this library can be used.
 ## Overview
