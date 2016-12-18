@@ -1,7 +1,7 @@
 (ns epicea.optional
   (:require [clojure.spec :as spec]))
 
-(spec/def ::if-sym #(= `if %))
+(spec/def ::if-sym (constantly true)) ;#(= `if %))
 (spec/def ::expr (constantly true))
 (spec/def ::if-form (spec/cat :if-sym ::if-sym
                               :test ::expr
@@ -13,11 +13,11 @@
 (spec/def ::bindings (spec/cat :list (spec/* ::binding)))
 (spec/def ::form (constantly true))
 (spec/def ::forms (spec/* ::form))
-(spec/def ::let-symbol #(= `let %))
+(spec/def ::let-symbol (constantly true)); #(= `let %))
 
 (spec/def ::let-form (spec/cat
                       :let-symbol ::let-symbol
-                      :bindings (spec/spec ::bindings)
+                      :bindings ::bindings
                       :forms ::forms))
 
 (declare compile-sub)
@@ -136,14 +136,16 @@
         (cb m `(~(first x) ~@arg-list)))
       cb))))
 
-(defn compile-let-sub [m x cb]
-  (cb m x))
+(defn compile-let-sub [m bindings forms cb]
+  (cb m `(do ~@forms)))
 
 (defn compile-let [m x0 cb]
+  (println "GOT LET FORM: " x0)
   (let [x (spec/conform ::let-form x0)]
     (if (= x ::spec/invalid)
       (error (spec/explain ::let-form x0))
-      (compile-let-sub m x cb))))
+      (compile-let-sub m 
+        (:bindings x) (:forms x) cb))))
 
 (defn compile-do-sub [m forms cb]
   (cond
@@ -165,8 +167,10 @@
   (compile-do-sub m (rest x) cb))
 
 (defn compile-other-form [m x cb]
+  (println "GOT " x)
   (let [f (first x)
         k (get special-forms f)]
+    (println "special form sym: " k)
     (cond
       (= k :if) (compile-if m x cb)
       (= k :do) (compile-do m x cb)
@@ -175,13 +179,15 @@
       :default (compile-fun-call m x cb))))
 
 (defn compile-seq [m x cb]
+  (println "Compile seq")
   (let [f (first x)]
     (cond
       (either-sym? f) (compile-either m x cb)
       (optionally-sym? f) (compile-optionally m x cb)
-      :default (compile-other-form m (macroexpand x) cb))))
+      :default (compile-other-form m x cb))))
 
 (defn compile-sub [m x cb]
+  (println "COMPILE SUB!" x)
   (cond
     (seq? x) (compile-seq m x cb)
     :default (cb m x)))
