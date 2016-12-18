@@ -8,6 +8,18 @@
                               :on-true ::expr
                               :on-false (spec/? ::expr)))
 
+(spec/def ::binding (spec/cat :symbol ::expr
+                              :expr ::expr))
+(spec/def ::bindings (spec/cat :list (spec/* ::binding)))
+(spec/def ::form (constantly true))
+(spec/def ::forms (spec/* ::form))
+(spec/def ::let-symbol #(= `let %))
+
+(spec/def ::let-form (spec/cat
+                      :let-symbol ::let-symbol
+                      :bindings (spec/spec ::bindings)
+                      :forms ::forms))
+
 
 (declare compile-sub)
 
