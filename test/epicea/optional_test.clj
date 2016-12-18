@@ -53,7 +53,11 @@
 (deftest do-test
   (testing "do form"
     (is (= 2 (either (do (optionally true 1) 2) nil)))
-    (is (nil? (either (do (optionally false 1) 2) nil)))))
+    (is (nil? (either (do (optionally false 1) 2) nil)))
+    (let [x (atom false)]
+      (is (= :bad (either (do (reset! x true) (optionally false 9) 19)
+                          :bad)))
+      (is (deref x)))))
 
 ;(defn add-3-expect [x]
 ;  (either (+ 3 (expect number? x))
