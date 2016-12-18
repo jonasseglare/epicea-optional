@@ -47,20 +47,17 @@
 
 (def special-forms {'if :if ;; OK
                     'do :do
-                    'loop :loop
-                    'var :var
-                    ;`let :let
-                    ;'let :let
-                    ;'let :let
                     'let* :let
+                    'loop :loop
+                    'recur :recur
                     'fn :fn
                     'throw :throw
                     'try :try
+                    'def :def
+                    'var :var
                     'catch :catch
                     'monitor-enter :monitor-enter
-                    'monitor-exit :monitor-exit
-                    'recur :recur
-                    'def :def})
+                    'monitor-exit :monitor-exit})
 
 (defn error [& s]
   (throw (RuntimeException. (apply str s))))
@@ -89,7 +86,6 @@
   (compile-either-sub m (rest x) cb))
 
 (defn compile-optionally-sub [m [test-expr value-expr] cb]
-  (println "COMPILE OPTIONALLY: " test-expr value-expr)
   (let [t (gensym)
         v (gensym)]
     `(let [~t ~test-expr
@@ -158,7 +154,6 @@
                 
 
 (defn compile-let [m x0 cb]
-  (println "COMPILE LET:" x0)
   (let [x (spec/conform ::basic-let-form x0)]
     (if (= x ::spec/invalid)
       (error (spec/explain ::basic-let-form x0))
@@ -185,7 +180,6 @@
   (compile-do-sub m (rest x) cb))
 
 (defn compile-function-or-macro-call [m x cb]
-  (println "COMPILE FUNCTION OR MACRO CALL:" x)
   (let [expanded (macroexpand x)]
     (if (= expanded x)
       (compile-fun-call m x cb)
