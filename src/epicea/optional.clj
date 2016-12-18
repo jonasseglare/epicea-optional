@@ -8,9 +8,9 @@
                               :on-true ::expr
                               :on-false (spec/? ::expr)))
 
-(spec/def ::binding (spec/cat :symbol ::expr
+(spec/def ::binding (spec/cat :symbol simple-symbol?
                               :expr ::expr))
-(spec/def ::bindings (spec/cat :list (spec/* ::binding)))
+(spec/def ::bindings (spec/* ::binding))
 (spec/def ::form (constantly true))
 (spec/def ::forms (spec/* ::form))
 (spec/def ::let-symbol (constantly true)); #(= `let %))
@@ -142,8 +142,22 @@
   (if (empty? bindings)
     (compile-sub
      m `(do ~@forms) cb)
-    (let [[b & rb] bindings]
-      (cb m `(do ~@forms)))))
+    (let [[{:keys [symbol expr]} & rb] bindings]
+      (println "bindings =" bindings)
+      (println "symbol =" symbol)
+      (println "expr =" expr)
+      (println "rb =" rb)
+      (compile-sub 
+       m expr
+       (fn [m x]
+         `(let [~symbol ~x]
+            ~(compile-let-sub
+                 (if (contains? m x)
+                   (assoc m (get m x))
+                   (dissoc m symbol))
+               rb forms cb)))))))
+              
+                
 
 (defn compile-let [m x0 cb]
   (let [x (spec/conform ::basic-let-form x0)]
