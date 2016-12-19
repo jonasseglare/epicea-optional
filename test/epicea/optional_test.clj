@@ -167,4 +167,5 @@
 (deftest bmi-test-basic
   (is (= (compute-bmi-from-pair [70.0 1.73])
          (compute-bmi {:weight 70.0 :height 1.73})))
-  (is (nil? (explain-person [70.0 1.73]))))
+  (is (nil? (explain-person [70.0 1.73])))
+  (is (not (nil? (explain-person 3)))))
