@@ -1,8 +1,10 @@
 (ns epicea.optional-test
   (:require [clojure.test :refer :all]
+            [clojure.spec :as spec]
             [epicea.optional :refer 
              [either optionally test-special
-              compile-top expect defined? undefined? but]] :reload-all))
+              compile-top expect defined? undefined? but]]
+            [epicea.spec :refer [conform explain]] :reload-all))
 
 (deftest basic
   (testing "Basic testing"
@@ -142,3 +144,27 @@
   (either (compute-bmi-sub (expect number? (:weight person))
                            (expect number? (:height person)))
           nil))
+
+
+(deftest bmi-test-basic
+  (is (number? (compute-bmi {:weight 70 :height 1.73})))
+  (is (not (number? (compute-bmi {:height 1.73})))))
+
+(spec/def ::weight number?)
+(spec/def ::height number?)
+(spec/def ::person (spec/cat
+                    :weight ::weight
+                    :height ::height))
+
+(defn compute-bmi-from-pair [pair]
+  (either (compute-bmi (conform ::person pair))
+          nil))
+
+(defn explain-person [x]
+  (either (explain ::person x)
+          nil))
+
+(deftest bmi-test-basic
+  (is (= (compute-bmi-from-pair [70.0 1.73])
+         (compute-bmi {:weight 70.0 :height 1.73})))
+  (is (nil? (explain-person [70.0 1.73]))))
