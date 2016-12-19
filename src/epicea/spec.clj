@@ -20,7 +20,11 @@
   (with-out-str
     (spec/explain s x)))
 
-;; (fn [x] (not (successful-explanation x)))
+
+(defmacro explain2 [s x]
+  `(opt/expect
+    (fn [x] (not (successful-explanation x)))
+    (explain-str ~s ~x)))
 
 ;; Like clojure.spec/explain, but
 ;;   * Returns the explanation as a string
