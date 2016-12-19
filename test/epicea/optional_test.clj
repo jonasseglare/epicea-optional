@@ -156,8 +156,8 @@
                     :weight ::weight
                     :height ::height))
 
-(defn compute-bmi-from-pair [pair]
-  (either (compute-bmi (conform ::person pair))
+(defn compute-bmi-from-spec [pair]
+  (either (compute-bmi (epicea.spec/conform ::person pair))
           nil))
 
 (defn explain-person [x]
@@ -165,7 +165,7 @@
           nil))
 
 (deftest bmi-test-basic
-  (is (= (compute-bmi-from-pair [70.0 1.73])
+  (is (= (compute-bmi-from-spec [70.0 1.73])
          (compute-bmi {:weight 70.0 :height 1.73})))
   (is (nil? (explain-person [70.0 1.73])))
   (is (not (nil? (explain-person 3)))))

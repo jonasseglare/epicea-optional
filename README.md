@@ -24,6 +24,13 @@ Example of BMI calculator:
 (compute-bmi {:height 1.73})
 ;;nil
 ```
+The ```epicea.spec/conform``` works just like ```clojure.spec/conform``` but returns an optional which is only defined if the data conforms with the spec:
+```clojure
+(defn compute-bmi-from-spec [pair]
+  (either (compute-bmi (epicea.spec/conform ::person pair))
+          nil))
+
+```
 *See the unittests* for a rich set of examples of how this library can be used.
 ## Overview
 * Use ```(either expr*)``` to choose the first defined value among a set of optional expressions.
