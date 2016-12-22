@@ -174,4 +174,7 @@
   (is (= 3 (either (expect number? (expect number? (expect number? 3)))
                    4)))
   (is (= 4 (either (expect number? (either (expect number? :a) 4))
+                   5)))
+  (is (= 5 (either (expect number? (either :a 4))
                    5))))
+
