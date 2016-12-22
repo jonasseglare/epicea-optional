@@ -419,14 +419,11 @@
       :default (compile-other-form m x cb))))
 
 (defn compile-coll [m x cb wrapper]
-  (compile-arg-list 
-   [] m x
+  (compile-args-and-wrap
+   m x
    (fn [m arg-list]
-     (wrap-sub-expr 
-      m arg-list
-      (fn [m]
-        (cb m (wrapper arg-list)))
-      cb))))
+     (cb m (wrapper arg-list)))
+   cb))
 
 (defn compile-vector [m x cb]
   (compile-coll m x cb vec))
