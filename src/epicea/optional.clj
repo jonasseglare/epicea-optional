@@ -199,14 +199,11 @@
       cb-none))))
 
 (defn compile-fun-call [m x cb]
-  (compile-arg-list 
-   [] m x
+  (compile-args-and-wrap
+   m x
    (fn [m arg-list]
-     (wrap-sub-expr 
-      m arg-list
-      (fn [m]
-        (cb m `(~@arg-list)))
-      cb))))
+     (cb m `(~@arg-list)))
+   cb))
 
 (defn compile-bindings [m bindings cb]
   (if (empty? bindings)
