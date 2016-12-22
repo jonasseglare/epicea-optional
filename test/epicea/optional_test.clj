@@ -178,3 +178,30 @@
   (is (= 5 (either (expect number? (either :a 4))
                    5))))
 
+(defn problematic []
+  (macroexpand 
+   '(either (clojure.core/binding 
+                [clojure.core/*out* s__7368__auto__] 
+              (println "GOS") 
+              (clojure.core/str s__7368__auto__)))))
+
+(defn problematic-2 []
+  (macroexpand 
+   '(either 
+     (let* [] 
+       (clojure.core/push-thread-bindings 
+        (clojure.core/hash-map 
+         (var clojure.core/*out*) s__7368__auto__)) 
+       (try (println "GOS") 
+            (clojure.core/str s__7368__auto__) 
+            (finally (clojure.core/pop-thread-bindings)))))))
+(defn problematic-3 []
+  (macroexpand 
+   '(either 
+     (try 
+       (println "GOS") 
+       (clojure.core/str s__7368__auto__) 
+       (finally (clojure.core/pop-thread-bindings))))))
+
+
+;;(do (clojure.core/push-thread-bindings (clojure.core/hash-map (var clojure.core/*out*) s__7368__auto__)) (try (clojure.core/pop-thread-bindings) (finally (clojure.core/pop-thread-bindings))))

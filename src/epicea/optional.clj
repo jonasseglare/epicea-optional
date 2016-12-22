@@ -71,6 +71,12 @@
                       :catch-forms (spec/* ::catch-form)
                       :finally-form (spec/? ::finally-form)))
 
+(defmacro dout [x]
+  `(let [k# ~x]
+     (println "------> DOUT:" ~(str x) "=" k#)
+     k#))
+
+
 (declare compile-sub)
 
 (defn dissoc-many [m symbols]
@@ -255,6 +261,11 @@
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
 
+(defn tagged-cb [tag cb]
+  (fn [m x]
+    (println tag "received as argument" x "\n\n")
+    (cb m x)))
+
 (defn compile-function-or-macro-call [m x cb]
   (let [expanded (macroexpand x)]
     (if (= expanded x)
@@ -372,23 +383,32 @@
       m `(do ~forms)
       (return-defined "The finally form cannot be optional")))))
 
+(defn merge-many [& maps]
+  (dout maps)
+  (apply merge maps))
+
+(defn compile-try-spec [m x]
+  (dout x)
+  (merge-many
+   x
+
+   {:forms
+    [(dout (compile-sub
+            m `(do ~@(:forms x)) 
+            (return-defined "Forms inside try must not be optional")))]}
+
+   {:catch-forms
+    (compile-catch-forms m (:catch-forms x))}
+   
+   (if (contains? x :finally-form)
+     {:finally-form (compile-finally-form m (:finally-form x))}
+     {})))
+
 (defn compile-try-sub [m x cb]
+  (println "Compile-try-sub for " x)
   (cb m (spec/unform
          ::try-form
-         (merge
-          x
-
-          {:forms
-           [(compile-sub
-             m `(do ~@(:forms x)) 
-             (return-defined "Forms inside try must not be optional"))]}
-
-          {:catch-forms
-           (compile-catch-forms m (:catch-forms x))}
-          
-          (if (contains? x :finally-form)
-            (compile-finally-form m (:finally-form x))
-            {})))))
+         (dout (compile-try-spec m x)))))
 
 
 (defn compile-try [m x0 cb]
@@ -455,13 +475,14 @@
 (defn compile-map [m x cb]
   (compile-coll m (get-flat-map-data x) cb make-map-from-flat-data))
 
-(defn compile-sub [m x cb]
-  (cond
-    (seq? x) (compile-seq m x cb)
-    (vector? x) (compile-vector m x cb)
-    (set? x) (compile-set m x cb)
-    (map? x) (compile-map m x cb)
-    :default (cb m x)))
+(defn compile-sub [m x cb0]
+  (let [cb cb0] ;(tagged-cb (str "compile-sub on " x) cb0)]
+    (cond
+      (seq? x) (compile-seq m x cb)
+      (vector? x) (compile-vector m x cb)
+      (set? x) (compile-set m x cb)
+      (map? x) (compile-map m x cb)
+      :default (cb m x))))
 
 
 (defn compile-top [x]
