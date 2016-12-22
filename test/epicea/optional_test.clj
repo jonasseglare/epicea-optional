@@ -169,3 +169,7 @@
          (compute-bmi {:weight 70.0 :height 1.73})))
   (is (nil? (explain-person [70.0 1.73])))
   (is (not (nil? (explain-person 3)))))
+
+(deftest nesting
+  (is (= 3 (either (expect number? (expect number? (expect number? 3)))
+                   4))))
