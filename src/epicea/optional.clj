@@ -147,6 +147,7 @@
 (defn compile-either [m x cb]
   (compile-either-sub m (rest x) cb))
 
+;; TODO: THE EXPRESSIONS MUST BE COMPILED, TO!!!
 (defn compile-optionally-sub [m [test-expr value-expr] cb]
   (let [t (gensym)
         v (gensym)]
@@ -187,6 +188,15 @@
        (compile-arg-list 
         (conj acc expr)
         m (rest args) cb)))))
+
+(defn compile-args-and-wrap [m x cb-wrapped cb-none]
+  (compile-arg-list
+   [] m x
+   (fn [m arg-list]
+     (wrap-sub-expr
+      m arg-list
+      (fn [m] (cb-wrapped m arg-list))
+      cb-none))))
 
 (defn compile-fun-call [m x cb]
   (compile-arg-list 
