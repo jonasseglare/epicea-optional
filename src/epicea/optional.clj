@@ -76,6 +76,7 @@
 (defn dissoc-many [m symbols]
   (reduce dissoc m symbols))
 
+
 (defn wrap-dependent-sub-expr [symbols m cb-subexpr cb]
   (let [val-sym (gensym)
         test-sym (gensym)]
@@ -86,12 +87,32 @@
 (defn get-optional-test-symbols [m dependencies]
   (filter identity (map #(get m %) dependencies)))
 
+(defn compile-arg-list [acc m args cb]
+  (if (empty? args)
+    (cb m acc)
+    (compile-sub 
+     m (first args) 
+     (fn [m expr]
+       (compile-arg-list 
+        (conj acc expr)
+        m (rest args) cb)))))
+
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
   (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
       (cb-subexpr m)
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
+
+(defn compile-args-and-wrap [m x cb-wrapped cb-none]
+  (compile-arg-list
+   [] m x
+   (fn [m arg-list]
+     (wrap-sub-expr
+      m arg-list
+      (fn [m] (cb-wrapped m arg-list))
+      cb-none))))
+
 
 (defn either-sym? [f]
   (or (= 'either f) (= `either f)))
@@ -148,12 +169,16 @@
   (compile-either-sub m (rest x) cb))
 
 ;; TODO: THE EXPRESSIONS MUST BE COMPILED, TO!!!
-(defn compile-optionally-sub [m [test-expr value-expr] cb]
+(defn compile-optionally-sub [m args cb]
   (let [t (gensym)
         v (gensym)]
-    `(let [~t ~test-expr
-           ~v (if ~t ~value-expr)]
-       ~(cb (assoc m v t) v))))
+    (compile-args-and-wrap
+     m args
+     (fn [m [test-expr value-expr]]
+       `(let [~t ~test-expr
+              ~v (if ~t ~value-expr)]
+          ~(cb (assoc m v t) v)))
+     cb)))
 
 (defn compile-optionally [m x cb]
   (let [args (rest x)]
@@ -178,25 +203,6 @@
     (if (= ::spec/invalid x)
       (error (spec/explain ::if-form x0))
       (compile-if-sub m x cb))))
-
-(defn compile-arg-list [acc m args cb]
-  (if (empty? args)
-    (cb m acc)
-    (compile-sub 
-     m (first args) 
-     (fn [m expr]
-       (compile-arg-list 
-        (conj acc expr)
-        m (rest args) cb)))))
-
-(defn compile-args-and-wrap [m x cb-wrapped cb-none]
-  (compile-arg-list
-   [] m x
-   (fn [m arg-list]
-     (wrap-sub-expr
-      m arg-list
-      (fn [m] (cb-wrapped m arg-list))
-      cb-none))))
 
 (defn compile-fun-call [m x cb]
   (compile-args-and-wrap
