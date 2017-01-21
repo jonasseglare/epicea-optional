@@ -93,6 +93,13 @@
 (defn get-optional-test-symbols [m dependencies]
   (filter identity (map #(get m %) dependencies)))
 
+(defn wrap-sub-expr [m dependencies cb-subexpr cb]
+  (let [symbols (get-optional-test-symbols m dependencies)]
+    (if (empty? symbols)
+      (cb-subexpr m)
+      (wrap-dependent-sub-expr
+       symbols m cb-subexpr cb))))
+
 (defn compile-arg-list [acc m args cb]
   (if (empty? args)
     (cb m acc)
@@ -102,13 +109,6 @@
        (compile-arg-list 
         (conj acc expr)
         m (rest args) cb)))))
-
-(defn wrap-sub-expr [m dependencies cb-subexpr cb]
-  (let [symbols (get-optional-test-symbols m dependencies)]
-    (if (empty? symbols)
-      (cb-subexpr m)
-      (wrap-dependent-sub-expr
-       symbols m cb-subexpr cb))))
 
 (defn compile-args-and-wrap [m x cb-wrapped cb-none]
   (compile-arg-list
