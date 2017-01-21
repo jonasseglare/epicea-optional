@@ -89,9 +89,10 @@
 (defn wrap-dependent-sub-expr [symbols m cb-subexpr cb]
   (let [val-sym (gensym)
         test-sym (gensym)]
-    `(let [~test-sym (and ~@symbols)
-           ~val-sym (if ~test-sym ~(cb-subexpr (dissoc-many m symbols)))]
-       ~(cb (assoc m val-sym test-sym) val-sym))))
+    `(let [~test-sym (and ~@symbols)]
+       (if ~test-sym
+         ~(cb-subexpr (dissoc-many m symbols))
+         ~(cb (assoc m test-sym test-sym) test-sym)))))
 
 ;; If all dependencies are good, call cb-subexpr only if those
 ;; dependencies are OK. Call cb with the output
