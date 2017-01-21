@@ -104,11 +104,7 @@
        symbols m cb-subexpr cb))))
 
 (defn with-dependent [m dep cb-expr cb]
-  (if (contains? m dep)
-    `(if ~(get m dep)
-       ~(cb-expr (dissoc m dep))
-       ~(cb m dep))
-    (cb-expr m)))
+  (wrap-sub-expr m [dep] cb-expr cb))
 
 
 (defn compile-arg-list [acc m args cb]
