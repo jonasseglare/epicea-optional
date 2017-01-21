@@ -187,5 +187,9 @@
 (deftest do-bug
   (is (= 7 (either (KKKK 3 (let* [x (expect number? 4)] x x)) nil))))
 
+(deftest if-bug
+  (is (= 11 (either (+ 7 (if (= 3 (expect number? 3)) 4 5)) nil))))
+
+
 ;;; Problem: This should evaluate to 7, but it evaluates to 10 (+ 3 (+ 3 4))
 ;;; (either (KKKK 3 (let* [x (expect number? 4)] x x)) nil)
