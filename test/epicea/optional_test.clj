@@ -194,6 +194,9 @@
   (is (= [1 2 3 4] (either (conj [1 2 (expect number? 3)] 4) nil)))
   (is (= 7 (either (+ 3 (+ 2 (expect number? 2))) nil))))
 
+(deftest more-tests
+  (is (= 4 (either (+ 3 (+ 2 (expect number? :a))) 4))))
+
 
 ;;; Problem: This should evaluate to 7, but it evaluates to 10 (+ 3 (+ 3 4))
 ;;; (either (KKKK 3 (let* [x (expect number? 4)] x x)) nil)
