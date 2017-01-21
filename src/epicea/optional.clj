@@ -256,7 +256,7 @@
      (fn [m x]
        (wrap-sub-expr 
         m [x] 
-        (fn [m] (dout `(do ~x ~(compile-do-sub m (rest forms) cb))))
+        (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
         cb))))) ;;;;;;;;;;;;;;;;;;;;;;;; TODO: The problem is here!!!!
 
 
