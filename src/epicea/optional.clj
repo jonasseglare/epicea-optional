@@ -206,9 +206,10 @@
     m (:test x)
     (fn [m test-expr]
       (with-dependent m test-expr
-        `(if ~test-expr
-           ~(fn [m] (compile-sub m (:on-true x) cb))
-           ~(fn [m] (compile-sub m (:on-false x) cb)))
+        (fn [m]
+          `(if ~test-expr
+             ~(compile-sub m (:on-true x) cb)
+             ~(compile-sub m (:on-false x) cb)))
         cb))))
 
 (defn compile-if [m x0 cb]
