@@ -192,17 +192,24 @@
       (compile-optionally-sub m args cb)
       (error "optionally expects two arguments but got " x))))
 
+
+(defn with-dependent [m dep expr cb]
+  (if (contains? m dep)
+    `(if ~(get m dep)
+       ~expr
+       ~(cb m dep))
+    expr))
+
+
  (defn compile-if-sub [m x cb]
    (compile-sub 
     m (:test x)
     (fn [m test-expr]
-      (wrap-sub-expr 
-       m [test-expr]
-       (fn [m]
-         `(if ~test-expr
-            ~(compile-sub m (:on-true x) cb)
-            ~(compile-sub m (:on-false x) cb))) 
-       cb))))
+      (with-dependent m test-expr
+        `(if ~test-expr
+           ~(compile-sub m (:on-true x) cb)
+           ~(compile-sub m (:on-false x) cb))
+        cb))))
 
 (defn compile-if [m x0 cb]
   (let [x (spec/conform ::if-form x0)]
