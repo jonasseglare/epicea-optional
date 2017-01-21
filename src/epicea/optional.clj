@@ -83,6 +83,9 @@
   (reduce dissoc m symbols))
 
 
+(defn get-optional-test-symbols [m dependencies]
+  (filter identity (map #(get m %) dependencies)))
+
 (defn wrap-dependent-sub-expr [symbols m cb-subexpr cb]
   (let [val-sym (gensym)
         test-sym (gensym)]
@@ -90,9 +93,8 @@
            ~val-sym (if ~test-sym ~(cb-subexpr (dissoc-many m symbols)))]
        ~(cb (assoc m val-sym test-sym) val-sym))))
 
-(defn get-optional-test-symbols [m dependencies]
-  (filter identity (map #(get m %) dependencies)))
-
+;; If all dependencies are good, call cb-subexpr only if those
+;; dependencies are OK. Call cb with the output
 (defn wrap-sub-expr [m dependencies cb-subexpr cb]
   (let [symbols (get-optional-test-symbols m dependencies)]
     (if (empty? symbols)
