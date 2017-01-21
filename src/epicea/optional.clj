@@ -254,11 +254,11 @@
     (compile-sub 
      m (first forms)
      (fn [m x]
-       `(do ~x ~(compile-do-sub m (rest forms) cb))))))
-;       (wrap-sub-expr 
-;        m [x] 
-;        (fn [m] (dout `(do ~x ~(compile-do-sub m (rest forms) cb))))
-;        cb)))))
+       (wrap-sub-expr 
+        m [x] 
+        (fn [m] (dout `(do ~x ~(compile-do-sub m (rest forms) cb))))
+        cb))))) ;;;;;;;;;;;;;;;;;;;;;;;; TODO: The problem is here!!!!
+
 
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
