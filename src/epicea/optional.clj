@@ -103,6 +103,14 @@
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
 
+(defn with-dependent [m dep cb-expr cb]
+  (if (contains? m dep)
+    `(if ~(get m dep)
+       ~(cb-expr (dissoc m dep))
+       ~(cb m dep))
+    (cb-expr m)))
+
+
 (defn compile-arg-list [acc m args cb]
   (if (empty? args)
     (cb m acc)
@@ -194,14 +202,6 @@
     (if (= 2 (count args))
       (compile-optionally-sub m args cb)
       (error "optionally expects two arguments but got " x))))
-
-
-(defn with-dependent [m dep cb-expr cb]
-  (if (contains? m dep)
-    `(if ~(get m dep)
-       ~(cb-expr (dissoc m dep))
-       ~(cb m dep))
-    (cb-expr m)))
 
 
  (defn compile-if-sub [m x cb]
