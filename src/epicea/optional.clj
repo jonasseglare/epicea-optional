@@ -229,7 +229,8 @@
   (compile-bindings
    m bindings
    (fn [m]
-     (compile-sub m `(do ~@forms) cb))))              
+     (let [result (compile-sub m `(do ~@forms) cb)]
+       result))))
                 
 
 (defn compile-let [m x0 cb]
@@ -259,7 +260,8 @@
   (let [expanded (macroexpand x)]
     (if (= expanded x)
       (compile-fun-call m x cb)
-      (compile-sub m expanded cb))))
+      (do 
+        (compile-sub m expanded cb)))))
 
 (defn make-loop-bindings [bindings]
   (vec

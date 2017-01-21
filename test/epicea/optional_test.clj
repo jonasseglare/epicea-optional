@@ -180,3 +180,23 @@
 
 (deftest complex-macro
   (= "kattskit\n" (either (with-out-str (println "kattskit")))))
+
+(defmacro dout [x]
+  `(let [x# ~x]
+     (println ~(str x) "=" x#)
+     x#))
+
+;;; Problem: This should evaluate to 7, but it evaluates to 10 (+ 3 (+ 3 4))
+;;; (either (+ 3 (let* [x (expect number? 4)] x x)) nil)
+
+
+; (either (println "once" (expect identity 9)) 3)
+; (macroexpand '(either (+ 3 (dout (println "once" (expect number? 3))) 3)))
+;(either (+ 3 (dout (expect number? 3))) nil)
+
+;; Problem when expect appears as a let argument
+(comment (either (+ 3 (let*
+                 [x__25629__auto__ (expect number? 3)]
+               (clojure.core/println "(expect number? 3)" "=" x__25629__auto__)
+               x__25629__auto__)
+           nil)))
