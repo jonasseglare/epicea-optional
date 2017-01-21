@@ -254,10 +254,17 @@
     (compile-sub 
      m (first forms)
      (fn [m x]
-       (wrap-sub-expr 
-        m [x] 
-        (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
-        cb))))) ;;;;;;;;;;;;;;;;;;;;;;;; TODO: The problem is here!!!!
+       (if (contains? m x)
+         `(if ~(get m x)
+            (do ~x ~(compile-do-sub m (rest forms) cb))
+            ~(cb m x))
+         `(do ~x ~(compile-do-sub m (rest forms) cb)))))))
+
+;     (fn [m x]
+;       (wrap-sub-expr 
+;        m [x] 
+;        (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
+;        cb))))) ;;;;;;;;;;;;;;;;;;;;;;;; TODO: The problem is here!!!!
 
 
 (defn compile-do [m x cb]
