@@ -193,12 +193,12 @@
       (error "optionally expects two arguments but got " x))))
 
 
-(defn with-dependent [m dep expr cb]
+(defn with-dependent [m dep cb-expr cb]
   (if (contains? m dep)
     `(if ~(get m dep)
-       ~expr
+       ~(cb-expr (dissoc m dep))
        ~(cb m dep))
-    expr))
+    (cb-expr m)))
 
 
  (defn compile-if-sub [m x cb]
@@ -207,8 +207,8 @@
     (fn [m test-expr]
       (with-dependent m test-expr
         `(if ~test-expr
-           ~(compile-sub m (:on-true x) cb)
-           ~(compile-sub m (:on-false x) cb))
+           ~(fn [m] (compile-sub m (:on-true x) cb))
+           ~(fn [m] (compile-sub m (:on-false x) cb)))
         cb))))
 
 (defn compile-if [m x0 cb]
