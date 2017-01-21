@@ -261,11 +261,10 @@
     (compile-sub 
      m (first forms)
      (fn [m x]
-       (if (contains? m x)
-         `(if ~(get m x)
-            (do ~x ~(compile-do-sub m (rest forms) cb))
-            ~(cb m x))
-         `(do ~x ~(compile-do-sub m (rest forms) cb)))))))
+       (with-dependent 
+         m x
+         (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
+         cb)))))
 
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
