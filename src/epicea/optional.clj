@@ -102,6 +102,16 @@
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
 
+(defn with-dependents [m deps cb-expr cb]
+  (let [optsyms (get-optional-test-symbols m deps)
+        tsym (gensym)]
+    `(let [~tsym (and ~@optsyms)]
+       (if ~tsym
+         ~(cb-expr (dissoc-many m deps))
+         ~(cb (if (empty? optsyms) m (assoc m tsym tsym)) tsym)))))
+
+
+
 (defn compile-arg-list [acc m args cb]
   (if (empty? args)
     (cb m acc)
@@ -116,7 +126,7 @@
   (compile-arg-list
    [] m x
    (fn [m arg-list]
-     (wrap-sub-expr
+     (wrap-sub-expr ;(with-dependents
       m arg-list
       (fn [m] (cb-wrapped m arg-list))
       cb-none))))
@@ -269,13 +279,6 @@
             (do ~x ~(compile-do-sub m (rest forms) cb))
             ~(cb m x))
          `(do ~x ~(compile-do-sub m (rest forms) cb)))))))
-
-;     (fn [m x]
-;       (wrap-sub-expr 
-;        m [x] 
-;        (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
-;        cb))))) ;;;;;;;;;;;;;;;;;;;;;;;; TODO: The problem is here!!!!
-
 
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
