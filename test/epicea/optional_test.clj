@@ -184,6 +184,8 @@
 (deftest complex-macro
   (= "kattskit\n" (either (with-out-str (println "kattskit")))))
 
+(deftest do-bug
+  (is (= 7 (either (KKKK 3 (let* [x (expect number? 4)] x x)) nil))))
 
 ;;; Problem: This should evaluate to 7, but it evaluates to 10 (+ 3 (+ 3 4))
 ;;; (either (KKKK 3 (let* [x (expect number? 4)] x x)) nil)
