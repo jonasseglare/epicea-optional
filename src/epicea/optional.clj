@@ -144,9 +144,9 @@
                     'monitor-enter :monitor-enter ;; OK
                     'monitor-exit :monitor-exit ;; OK
                     'fn* :fn ;; OK
-                    'try :try
-                    'catch :catch
-                    'quote :quote
+                    'try :try ;; OK
+                    'catch :catch ;; OK
+                    'quote :quote ;; OK
                     })
 
 (defn error [& s]
