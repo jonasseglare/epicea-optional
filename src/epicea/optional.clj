@@ -73,6 +73,12 @@
 
 (declare compile-sub)
 
+(defmacro dout [x]
+  `(let [x# ~x]
+     (println ~(str x) "=" x#)
+     x#))
+
+
 (defn dissoc-many [m symbols]
   (reduce dissoc m symbols))
 
@@ -248,10 +254,11 @@
     (compile-sub 
      m (first forms)
      (fn [m x]
-       (wrap-sub-expr 
-        m [x] 
-        (fn [m] `(do ~x ~(compile-do-sub m (rest forms) cb)))
-        cb)))))
+       `(do ~x ~(compile-do-sub m (rest forms) cb))))))
+;       (wrap-sub-expr 
+;        m [x] 
+;        (fn [m] (dout `(do ~x ~(compile-do-sub m (rest forms) cb))))
+;        cb)))))
 
 (defn compile-do [m x cb]
   (compile-do-sub m (rest x) cb))
