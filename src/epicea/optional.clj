@@ -103,16 +103,6 @@
       (wrap-dependent-sub-expr
        symbols m cb-subexpr cb))))
 
-;; (defn with-dependents [m deps cb-expr cb]
-;;   (let [optsyms (get-optional-test-symbols m deps)
-;;         tsym (gensym)]
-;;     `(let [~tsym (and ~@optsyms)]
-;;        (if ~tsym
-;;          ~(cb-expr (dissoc-many m deps))
-;;          ~(cb (if (empty? optsyms) m (assoc m tsym tsym)) tsym)))))
-
-
-
 (defn compile-arg-list [acc m args cb]
   (if (empty? args)
     (cb m acc)
