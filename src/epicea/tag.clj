@@ -20,10 +20,10 @@
 
 ;;; Convenience definitions  
 (def tag-success (tag :success))
-(def tag-error (tag :error))
+(def tag-failure (tag :failure))
 (def undefined (tag :undefined nil))
 (def success? (tagged? :success))
-(def error? (tagged? :error))
+(def failure? (tagged? :failure))
 
 ;; Utilites for passing optional values between functions
 (defmacro wrap [expr]
